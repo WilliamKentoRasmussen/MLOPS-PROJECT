@@ -16,7 +16,8 @@ def train(
     epochs: int = 10,
     batch_size: int = 32,
     lr: float = 0.001,
-    device: str = "auto"
+    device: str = "auto",
+    patience: int = 5
 ) -> None:
     """
     Train a model on Chest X-Ray dataset.
@@ -27,6 +28,7 @@ def train(
         batch_size: Batch size for training
         lr: Learning rate
         device: Device to use ('auto', 'cuda', 'mps', 'cpu')
+        patience: Early stopping patience (epochs without improvement)
     """
     # Setup device
     if device == "auto":
@@ -57,7 +59,9 @@ def train(
     
     # Training loop
     print(f"\nTraining for {epochs} epochs...")
+    print(f"Early stopping patience: {patience} epochs\n")
     best_val_acc = 0.0
+    epochs_without_improvement = 0
     
     for epoch in range(epochs):
         # Train
@@ -99,12 +103,21 @@ def train(
               f"Train Loss: {train_loss/len(train_loader):.4f}, Acc: {train_acc:.2f}% | "
               f"Val Loss: {val_loss/len(val_loader):.4f}, Acc: {val_acc:.2f}%")
         
-        # Save best model
+        # Save best model and check early stopping
         if val_acc > best_val_acc:
             best_val_acc = val_acc
+            epochs_without_improvement = 0
             Path("models").mkdir(exist_ok=True)
             torch.save(model.state_dict(), f"models/{model_name}_best.pth")
             print(f"  → Saved best model (val_acc: {val_acc:.2f}%)")
+        else:
+            epochs_without_improvement += 1
+            print(f"  → No improvement ({epochs_without_improvement}/{patience})")
+            
+            if epochs_without_improvement >= patience:
+                print(f"\n⚠ Early stopping triggered after {epoch+1} epochs (no improvement for {patience} epochs)")
+                break
+
     
     print(f"\n✓ Training complete! Best val accuracy: {best_val_acc:.2f}%")
     print(f"Model saved to: models/{model_name}_best.pth")
