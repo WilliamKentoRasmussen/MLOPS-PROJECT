@@ -4,6 +4,7 @@ from pathlib import Path
 
 import hydra
 import torch
+import wandb
 from hydra.core.config_store import ConfigStore
 from omegaconf import DictConfig, OmegaConf
 from torch import nn
@@ -25,6 +26,15 @@ def train(cfg: DictConfig) -> None:
     print("Configuration:")
     print(OmegaConf.to_yaml(cfg))
     print("-" * 80)
+    
+    # Initialize Weights & Biases
+    wandb.init(
+        project="chest-xray-classification",
+        name=f"{cfg.model.name}_{cfg.training.lr}_{cfg.training.batch_size}",
+        config=OmegaConf.to_container(cfg, resolve=True),
+        tags=[cfg.model.name, f"bs{cfg.training.batch_size}"]
+    )
+    
     # Setup device
     device = cfg.device
     if device == "auto":
@@ -78,6 +88,7 @@ def train(cfg: DictConfig) -> None:
             train_total += labels.size(0)
         
         train_acc = 100 * train_correct / train_total
+        train_loss_avg = train_loss / len(train_loader)
         
         # Validate
         model.eval()
@@ -94,17 +105,33 @@ def train(cfg: DictConfig) -> None:
                 val_total += labels.size(0)
         
         val_acc = 100 * val_correct / val_total
+        val_loss_avg = val_loss / len(val_loader)
+        
+        # Log metrics to W&B
+        wandb.log({
+            "epoch": epoch + 1,
+            "train/loss": train_loss_avg,
+            "train/accuracy": train_acc,
+            "val/loss": val_loss_avg,
+            "val/accuracy": val_acc,
+        })
         
         print(f"Epoch {epoch+1}/{cfg.training.epochs} | "
-              f"Train Loss: {train_loss/len(train_loader):.4f}, Acc: {train_acc:.2f}% | "
-              f"Val Loss: {val_loss/len(val_loader):.4f}, Acc: {val_acc:.2f}%")
+              f"Train Loss: {train_loss_avg:.4f}, Acc: {train_acc:.2f}% | "
+              f"Val Loss: {val_loss_avg:.4f}, Acc: {val_acc:.2f}%")
         
         # Save best model and check early stopping
         if val_acc > best_val_acc:
             best_val_acc = val_acc
             epochs_without_improvement = 0
             Path(cfg.output.models_dir).mkdir(exist_ok=True)
-            torch.save(model.state_dict(), f"{cfg.output.models_dir}/{cfg.model.name}_best.pth")
+            model_path = f"{cfg.output.models_dir}/{cfg.model.name}_best.pth"
+            torch.save(model.state_dict(), model_path)
+            
+            # Log best model to W&B
+            wandb.log({"best_val_accuracy": best_val_acc})
+            wandb.save(model_path)
+            
             print(f"  → Saved best model (val_acc: {val_acc:.2f}%)")
         else:
             epochs_without_improvement += 1
@@ -117,6 +144,9 @@ def train(cfg: DictConfig) -> None:
     
     print(f"\n✓ Training complete! Best val accuracy: {best_val_acc:.2f}%")
     print(f"Model saved to: {cfg.output.models_dir}/{cfg.model.name}_best.pth")
+    
+    # Finish W&B run
+    wandb.finish()
 
 
 if __name__ == "__main__":
