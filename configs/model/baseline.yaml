@@ -1,0 +1,4 @@
+# Baseline CNN model configuration
+name: baseline
+num_classes: 2
+pretrained: false

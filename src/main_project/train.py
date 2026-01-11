@@ -2,8 +2,10 @@
 
 from pathlib import Path
 
+import hydra
 import torch
-import typer
+from hydra.core.config_store import ConfigStore
+from omegaconf import DictConfig, OmegaConf
 from torch import nn
 from torch.utils.data import DataLoader
 
@@ -11,43 +13,37 @@ from main_project.data import ChestXRayDataset
 from main_project.model import get_model
 
 
-def train(
-    model_name: str = "baseline",
-    epochs: int = 10,
-    batch_size: int = 32,
-    lr: float = 0.001,
-    device: str = "auto",
-    patience: int = 5
-) -> None:
+@hydra.main(version_base=None, config_path="../../configs", config_name="config")
+def train(cfg: DictConfig) -> None:
     """
-    Train a model on Chest X-Ray dataset.
+    Train a model on Chest X-Ray dataset using Hydra configuration.
     
     Args:
-        model_name: Model to use ('baseline', 'alexnet', 'vgg16')
-        epochs: Number of training epochs
-        batch_size: Batch size for training
-        lr: Learning rate
-        device: Device to use ('auto', 'cuda', 'mps', 'cpu')
-        patience: Early stopping patience (epochs without improvement)
+        cfg: Hydra configuration object containing all hyperparameters
     """
+    # Print configuration
+    print("Configuration:")
+    print(OmegaConf.to_yaml(cfg))
+    print("-" * 80)
     # Setup device
+    device = cfg.device
     if device == "auto":
         device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
-    print(f"Using device: {device}")
+    print(f"\nUsing device: {device}")
     
     # Load datasets
     print("Loading datasets...")
-    train_dataset = ChestXRayDataset(Path("data/processed"), split="train")
-    val_dataset = ChestXRayDataset(Path("data/processed"), split="val")
+    train_dataset = ChestXRayDataset(Path(cfg.data.root), split="train")
+    val_dataset = ChestXRayDataset(Path(cfg.data.root), split="val")
     
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=2)
-    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=2)
+    train_loader = DataLoader(train_dataset, batch_size=cfg.training.batch_size, shuffle=True, num_workers=cfg.data.num_workers)
+    val_loader = DataLoader(val_dataset, batch_size=cfg.training.batch_size, shuffle=False, num_workers=cfg.data.num_workers)
     
     print(f"Train samples: {len(train_dataset)}, Val samples: {len(val_dataset)}")
     
     # Create model
-    print(f"\nCreating {model_name} model...")
-    model = get_model(model_name, num_classes=2, pretrained=(model_name != "baseline"))
+    print(f"\nCreating {cfg.model.name} model...")
+    model = get_model(cfg.model.name, num_classes=cfg.model.num_classes, pretrained=cfg.model.pretrained)
     model = model.to(device)
     
     num_params = sum(p.numel() for p in model.parameters())
@@ -55,15 +51,15 @@ def train(
     
     # Loss and optimizer
     criterion = nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+    optimizer = torch.optim.Adam(model.parameters(), lr=cfg.training.lr)
     
     # Training loop
-    print(f"\nTraining for {epochs} epochs...")
-    print(f"Early stopping patience: {patience} epochs\n")
+    print(f"\nTraining for {cfg.training.epochs} epochs...")
+    print(f"Early stopping patience: {cfg.training.patience} epochs\n")
     best_val_acc = 0.0
     epochs_without_improvement = 0
     
-    for epoch in range(epochs):
+    for epoch in range(cfg.training.epochs):
         # Train
         model.train()
         train_loss, train_correct, train_total = 0.0, 0, 0
@@ -99,7 +95,7 @@ def train(
         
         val_acc = 100 * val_correct / val_total
         
-        print(f"Epoch {epoch+1}/{epochs} | "
+        print(f"Epoch {epoch+1}/{cfg.training.epochs} | "
               f"Train Loss: {train_loss/len(train_loader):.4f}, Acc: {train_acc:.2f}% | "
               f"Val Loss: {val_loss/len(val_loader):.4f}, Acc: {val_acc:.2f}%")
         
@@ -107,21 +103,21 @@ def train(
         if val_acc > best_val_acc:
             best_val_acc = val_acc
             epochs_without_improvement = 0
-            Path("models").mkdir(exist_ok=True)
-            torch.save(model.state_dict(), f"models/{model_name}_best.pth")
+            Path(cfg.output.models_dir).mkdir(exist_ok=True)
+            torch.save(model.state_dict(), f"{cfg.output.models_dir}/{cfg.model.name}_best.pth")
             print(f"  → Saved best model (val_acc: {val_acc:.2f}%)")
         else:
             epochs_without_improvement += 1
-            print(f"  → No improvement ({epochs_without_improvement}/{patience})")
+            print(f"  → No improvement ({epochs_without_improvement}/{cfg.training.patience})")
             
-            if epochs_without_improvement >= patience:
-                print(f"\n⚠ Early stopping triggered after {epoch+1} epochs (no improvement for {patience} epochs)")
+            if epochs_without_improvement >= cfg.training.patience:
+                print(f"\n⚠ Early stopping triggered after {epoch+1} epochs (no improvement for {cfg.training.patience} epochs)")
                 break
 
     
     print(f"\n✓ Training complete! Best val accuracy: {best_val_acc:.2f}%")
-    print(f"Model saved to: models/{model_name}_best.pth")
+    print(f"Model saved to: {cfg.output.models_dir}/{cfg.model.name}_best.pth")
 
 
 if __name__ == "__main__":
-    typer.run(train)
+    train()

@@ -1,0 +1,4 @@
+# VGG16 model configuration
+name: vgg16
+num_classes: 2
+pretrained: true
