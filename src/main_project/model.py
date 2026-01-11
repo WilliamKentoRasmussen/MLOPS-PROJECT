@@ -77,13 +77,10 @@ class VGG16(nn.Module):
         self.classifier = nn.Sequential(
             nn.Linear(features, 1024),
             nn.ReLU(),
-            nn.Dropout(0.5),
             nn.Linear(1024, 512),
             nn.ReLU(),
-            nn.Dropout(0.5),
             nn.Linear(512, 256),
             nn.ReLU(),
-            nn.Dropout(0.3),
             nn.Linear(256, self.num_classes)
         )
     
@@ -105,7 +102,7 @@ class VGG16(nn.Module):
 
 # Test with your dimensions
 if __name__ == "__main__":
-    model = VGG16(in_channels=1, num_classes=30, 
+    model = VGG16(in_channels=1, num_classes=3, 
                              input_height=1240, input_width=840)
     
     # Correct input shape: [batch, channels, height, width]
