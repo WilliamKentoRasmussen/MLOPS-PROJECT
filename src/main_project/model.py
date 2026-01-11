@@ -6,7 +6,7 @@ class VGG16(nn.Module):
         super().__init__()
         self.num_classes = num_classes
         
-        # Calculate padding needed
+        # Padding to match dimensions, after max pooling
         self.pad_height = (32 - (input_height % 32)) % 32
         self.pad_width = (32 - (input_width % 32)) % 32
         
@@ -17,7 +17,7 @@ class VGG16(nn.Module):
         # Padding layer
         self.pad = nn.ZeroPad2d((0, self.pad_width, 0, self.pad_height))
         
-        # Conv layers (same as before, with ReLU included)
+        # Conv layers
         self.conv_layers = nn.Sequential(
             # Block 1
             nn.Conv2d(in_channels, 64, kernel_size=3, padding="same", stride=1),
@@ -62,7 +62,6 @@ class VGG16(nn.Module):
         )
         
         self.flatten = nn.Flatten()
-        self.classifier = None
     
     def calculate_features(self, x: torch.Tensor) -> int:
         with torch.no_grad():
@@ -91,10 +90,6 @@ class VGG16(nn.Module):
         # Pad input
         x = self.pad(x)
         
-        # Build classifier if needed
-        if self.classifier is None:
-            self.build_classifier(x)
-        
         # Forward pass
         x = self.conv_layers(x)
         x = self.flatten(x)
@@ -105,10 +100,10 @@ class VGG16(nn.Module):
 
 # Test with your dimensions
 if __name__ == "__main__":
-    model = VGG16(in_channels=1, num_classes=30, 
+    model = VGG16(in_channels=1, num_classes=3, 
                              input_height=1240, input_width=840)
     
-    # Correct input shape: [batch, channels, height, width]
+    #[batch, channels, height, width]
     x = torch.rand(1, 1, 1240, 840)
     print(f"\nInput shape: {x.shape}")
     
