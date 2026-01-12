@@ -61,4 +61,14 @@ explicit = true
 line-length = 120
 
 [tool.coverage.run]
-omit = ["tests/*"]
+source = ["src/main_project"]
+omit = [
+    "tests/*",
+    "*/tmp*",
+    "*/_remote_module_non_scriptable.py",
+    "src/main_project/train.py",
+    "src/main_project/api.py",
+    "src/main_project/evaluate.py",
+    "src/main_project/visualize.py",
+    "src/main_project/__init__.py"
+]
