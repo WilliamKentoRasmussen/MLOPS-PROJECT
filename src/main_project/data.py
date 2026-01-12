@@ -4,7 +4,6 @@ from pathlib import Path
 import shutil
 
 import typer
-import kaggle
 from torch.utils.data import Dataset
 from torchvision import transforms
 from PIL import Image
@@ -49,6 +48,8 @@ class ChestXRayDataset(Dataset):
 
     def preprocess(self, output_folder: Path) -> None:
         """Preprocess the raw data and save it to the output folder."""
+        import kaggle  # Lazy import to avoid authentication error in CI
+
         raw_path = output_folder.parent / "raw"
         chest_xray_path = raw_path / "chest_xray"
 
