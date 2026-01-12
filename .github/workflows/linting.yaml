@@ -5,6 +5,8 @@ on:
     branches:
       - main
       - unit-tests
+      - data-preprocessing
+      - model-training
   pull_request:
     branches:
       - main
