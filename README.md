@@ -1,12 +1,12 @@
-# Project description 
+# Project description
 
 ### Overall goal of the project
 
-The goal of our project is to set up an end-to-end MLOps pipeline for a binary CNN Classifier for classifying pneumonia from chest X-ray images. This includes git workflow, version control, experiment reproducibility and cloud service. We will have an overall focus on good code practice, pytorch and monitoring the model. Our end result will be a successfully deployed CNN model, whose training has been properly logged, and finally, containerized and uploaded using docker. 
+The goal of our project is to set up an end-to-end MLOps pipeline for a binary CNN Classifier for classifying pneumonia from chest X-ray images. This includes git workflow, version control, experiment reproducibility and cloud service. We will have an overall focus on good code practice, pytorch and monitoring the model. Our end result will be a successfully deployed CNN model, whose training has been properly logged, and finally, containerized and uploaded using docker.
 
 ### What framework are you going to use, and you do you intend to include the framework into your project?
 
-For the model development we will use pytorch as the primary deep learning framework, due to its flexibility and strong ability for computer vision tasks. Image preprocessing and augmentation will be handled by PyTorch/vision.  
+For the model development we will use pytorch as the primary deep learning framework, due to its flexibility and strong ability for computer vision tasks. Image preprocessing and augmentation will be handled by PyTorch/vision.
 We envision setting up the framework as part of our environment, while writing and maintaining an organized structured code with version control. We are considering using the pytorch lightning framework, in order to boilerplate the training loop and hopefully make our model run faster
 
 ### What data are you going to run on (initially, may change)
@@ -15,7 +15,7 @@ The project will use the Chest X-Ray Pneumonia dataset, which contains 5,893 X-r
 
 ### What models do you expect to use
 
-We expect to use a Convolution Neural Network (CNN) for the classification of the images. Beginning with a simple CNN as a baseline, as to establish a reference-level of performance. We will implement transfer learning, by loading pre-trained weights for the first layers and then fine tune the following layers for our assignment in hand. We will apply a handful of different CNN architectures such as alexNet and VGGNET 16 and then use the respective model in our configuration. 
+We expect to use a Convolution Neural Network (CNN) for the classification of the images. Beginning with a simple CNN as a baseline, as to establish a reference-level of performance. We will implement transfer learning, by loading pre-trained weights for the first layers and then fine tune the following layers for our assignment in hand. We will apply a handful of different CNN architectures such as alexNet and VGGNET 16 and then use the respective model in our configuration.
 
 
 

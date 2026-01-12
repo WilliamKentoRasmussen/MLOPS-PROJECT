@@ -1,11 +1,10 @@
 from pathlib import Path
 
-import typer
 from torch.utils.data import Dataset
 import os
 from PIL import Image
 import torch
-from torchvision import transforms, models
+from torchvision import transforms
 from torch.utils.data import DataLoader, Dataset
 
 class PneumoniaDataset(Dataset):
@@ -16,15 +15,15 @@ class PneumoniaDataset(Dataset):
         self.root_dir = root_dir #root_dir - root directory of either val and train, test
         self.image_paths = []
         self.labels = []
-        self.transform = transform 
+        self.transform = transform
         #Normal: 0, Bacterial: 1, Viral: 2
-        self.classes = ['NORMAL', 'BACTERIAL', 'VIRAL'] #Phenumonia can be classified either as bacteiral or viral 
-        
+        self.classes = ['NORMAL', 'BACTERIAL', 'VIRAL'] #Phenumonia can be classified either as bacteiral or viral
+
 
         for label_dir in ['NORMAL', 'PNEUMONIA']:
             class_path = os.path.join(self.root_dir, label_dir)
             if not os.path.exists(class_path): continue
-            
+
             #Goes through all the images of Normal and Phenumonia images
             for img_name in os.listdir(class_path):
                 self.image_paths.append(os.path.join(class_path, img_name))
@@ -116,6 +115,3 @@ if __name__ == "__main__":
         print("Batch of images shape:", images.shape)  # Should be [batch_size, 3, 300, 300]
         print("Batch of labels shape:", labels.shape)  # Should be [batch_size]
         break
-
-
-

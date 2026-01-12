@@ -1,0 +1,38 @@
+name: Unit Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      matrix:
+        operating-system: ["windows-latest"]
+
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: 3.12
+
+
+      - name: Install dependencies
+        run: |
+          # assume ruff is in the dev dependencies, else you can add with
+          # uv add --dev ruff
+          uv sync --dev --locked
+
+      - name: Run coverage tests
+        run: |
+          uv run coverage run -m pytest tests/
+          uv run coverage report -m
