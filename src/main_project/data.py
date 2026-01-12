@@ -1,11 +1,10 @@
 from pathlib import Path
 
-import typer
 from torch.utils.data import Dataset
 import os
 from PIL import Image
 import torch
-from torchvision import transforms, models
+from torchvision import transforms
 from torch.utils.data import DataLoader, Dataset
 
 class PneumoniaDataset(Dataset):
