@@ -1,4 +1,4 @@
 [core]
     remote = storage
 ['remote "storage"']
-    url = gdrive://1j65FS0dy6_o_pMxnbWU0-YW7C1A4sKse
+    url = ssh://s252362@login.hpc.dtu.dk/zhome/5c/2/222250/mlops-data
