@@ -1,0 +1,5 @@
+# Quick training configuration for testing
+epochs: 3
+batch_size: 64
+lr: 0.001
+patience: 2

@@ -1,113 +1,106 @@
-from torch import nn
+"""Model architectures for Chest X-Ray classification."""
+
 import torch
+from torch import nn
+from torchvision import models
 
-class VGG16(nn.Module):
-    def __init__(self, in_channels, num_classes, input_height, input_width):
+
+class BaselineCNN(nn.Module):
+    """Simple CNN baseline for chest X-ray classification."""
+
+    def __init__(self, num_classes: int = 2) -> None:
+        """
+        Initialize the baseline CNN.
+
+        Args:
+            num_classes: Number of output classes (default: 2)
+        """
         super().__init__()
-        self.num_classes = num_classes
 
-        # Calculate padding needed
-        self.pad_height = (32 - (input_height % 32)) % 32
-        self.pad_width = (32 - (input_width % 32)) % 32
-
-        print(f"Input: {input_height}x{input_width}")
-        print(f"Padding: {self.pad_height} pixels height, {self.pad_width} pixels width")
-        print(f"Padded to: {input_height + self.pad_height}x{input_width + self.pad_width}")
-
-        # Padding layer
-        self.pad = nn.ZeroPad2d((0, self.pad_width, 0, self.pad_height))
-
-        # Conv layers (same as before, with ReLU included)
-        self.conv_layers = nn.Sequential(
+        self.features = nn.Sequential(
             # Block 1
-            nn.Conv2d(in_channels, 64, kernel_size=3, padding="same", stride=1),
-            nn.ReLU(),
-            nn.Conv2d(64, 64, kernel_size=3, padding="same", stride=1),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2),
-
+            nn.Conv2d(3, 32, kernel_size=3, padding=1),
+            nn.BatchNorm2d(32),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(2, 2),
             # Block 2
-            nn.Conv2d(64, 128, kernel_size=3, padding="same", stride=1),
-            nn.ReLU(),
-            nn.Conv2d(128, 128, kernel_size=3, padding="same", stride=1),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2),
-
+            nn.Conv2d(32, 64, kernel_size=3, padding=1),
+            nn.BatchNorm2d(64),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(2, 2),
             # Block 3
-            nn.Conv2d(128, 256, kernel_size=3, padding="same", stride=1),
-            nn.ReLU(),
-            nn.Conv2d(256, 256, kernel_size=3, padding="same", stride=1),
-            nn.ReLU(),
-            nn.Conv2d(256, 256, kernel_size=3, padding="same", stride=1),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2),
-
-            # Block 4
-            nn.Conv2d(256, 512, kernel_size=3, padding="same", stride=1),
-            nn.ReLU(),
-            nn.Conv2d(512, 512, kernel_size=3, padding="same", stride=1),
-            nn.ReLU(),
-            nn.Conv2d(512, 512, kernel_size=3, padding="same", stride=1),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2),
-
-            # Block 5
-            nn.Conv2d(512, 512, kernel_size=3, padding="same", stride=1),
-            nn.ReLU(),
-            nn.Conv2d(512, 512, kernel_size=3, padding="same", stride=1),
-            nn.ReLU(),
-            nn.Conv2d(512, 512, kernel_size=3, padding="same", stride=1),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2)
+            nn.Conv2d(64, 128, kernel_size=3, padding=1),
+            nn.BatchNorm2d(128),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(2, 2),
         )
 
-        self.flatten = nn.Flatten()
-        self.classifier = None
-
-    def calculate_features(self, x: torch.Tensor) -> int:
-        with torch.no_grad():
-            x = self.pad(x)
-            features = self.conv_layers(x)
-            return features.numel() // x.shape[0]
-
-    def build_classifier(self, x: torch.Tensor) -> None:
-        features = self.calculate_features(x)
-        print(f"Classifier input features: {features}")
-
         self.classifier = nn.Sequential(
-            nn.Linear(features, 1024),
-            nn.ReLU(),
-            nn.Linear(1024, 512),
-            nn.ReLU(),
-            nn.Linear(512, 256),
-            nn.ReLU(),
-            nn.Linear(256, self.num_classes)
+            nn.AdaptiveAvgPool2d((1, 1)),
+            nn.Flatten(),
+            nn.Linear(128, 64),
+            nn.ReLU(inplace=True),
+            nn.Dropout(0.5),
+            nn.Linear(64, num_classes),
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        # Pad input
-        x = self.pad(x)
+        """
+        Forward pass through the network.
 
-        # Build classifier if needed
-        if self.classifier is None:
-            self.build_classifier(x)
+        Args:
+            x: Input tensor of shape (batch_size, 3, 224, 224)
 
-        # Forward pass
-        x = self.conv_layers(x)
-        x = self.flatten(x)
+        Returns:
+            Output tensor of shape (batch_size, num_classes)
+        """
+        x = self.features(x)
         x = self.classifier(x)
+        return x
+
+
+def get_model(model_name: str = "baseline", num_classes: int = 2, pretrained: bool = True) -> nn.Module:
+    """
+    Get a model for chest X-ray classification.
+
+    Args:
+        model_name: 'baseline', 'alexnet', or 'vgg16'
+        num_classes: Number of output classes (default: 2)
+        pretrained: Use pretrained weights for transfer learning
+
+    Returns:
+        PyTorch model
+    """
+    if model_name == "baseline":
+        return BaselineCNN(num_classes=num_classes)
+
+    elif model_name == "alexnet":
+        model = models.alexnet(weights=models.AlexNet_Weights.IMAGENET1K_V1 if pretrained else None)
+        model.classifier[6] = nn.Linear(4096, num_classes)
+        return model
+
+    elif model_name == "vgg16":
+        model = models.vgg16(weights=models.VGG16_Weights.IMAGENET1K_V1 if pretrained else None)
+        model.classifier[6] = nn.Linear(4096, num_classes)
+        return model
+
+    else:
+        raise ValueError(f"Unknown model: {model_name}. Choose 'baseline', 'alexnet', or 'vgg16'")
+
 
         return x
 
 
 # Test with your dimensions
 if __name__ == "__main__":
-    model = VGG16(in_channels=1, num_classes=3,
-                             input_height=1240, input_width=840)
+    # Test models
+    print("Testing model architectures...\n")
 
-    # Correct input shape: [batch, channels, height, width]
-    x = torch.rand(1, 1, 1240, 840)
-    print(f"\nInput shape: {x.shape}")
+    models_to_test = ["baseline", "alexnet", "vgg16"]
+    dummy_input = torch.randn(1, 3, 224, 224)
 
-    output = model(x)
-    print(f"Output shape: {output.shape}")
+    for model_name in models_to_test:
+        model = get_model(model_name, pretrained=False)
+        output = model(dummy_input)
+        num_params = sum(p.numel() for p in model.parameters())
+        print(f"{model_name:10s} | Params: {num_params:>10,} | Output: {output.shape}")

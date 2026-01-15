@@ -1,88 +1,83 @@
+"""Data loading and preprocessing for Chest X-Ray Pneumonia dataset."""
+
+import shutil
 from pathlib import Path
 
-from torch.utils.data import Dataset
-import os
-from PIL import Image
+
+import kaggle
 import torch
+import typer
+from PIL import Image
+from torch.utils.data import Dataset
 from torchvision import transforms
-from torch.utils.data import DataLoader, Dataset
 
-class PneumoniaDataset(Dataset):
-    """My custom dataset."""
 
-    def __init__(self, root_dir: Path, transform = None) -> None:
+class ChestXRayDataset(Dataset):
+    """Chest X-Ray Pneumonia dataset."""
 
-        self.root_dir = root_dir #root_dir - root directory of either val and train, test
-        self.image_paths = []
+    def __init__(self, data_path: Path, split: str = "train") -> None:
+        self.data_path = data_path / split
+
+        # Collect image paths and labels
+        self.samples = []
         self.labels = []
-        self.transform = transform
-        #Normal: 0, Bacterial: 1, Viral: 2
-        self.classes = ['NORMAL', 'BACTERIAL', 'VIRAL'] #Phenumonia can be classified either as bacteiral or viral
 
+        # NORMAL = 0, PNEUMONIA = 1
+        for label, class_name in enumerate(["NORMAL", "PNEUMONIA"]):
+            class_dir = self.data_path / class_name
+            if class_dir.exists():
+                for img_path in sorted(class_dir.glob("*.jpeg")):
+                    self.samples.append(img_path)
+                    self.labels.append(label)
 
-        for label_dir in ['NORMAL', 'PNEUMONIA']:
-            class_path = os.path.join(self.root_dir, label_dir)
-            if not os.path.exists(class_path): continue
-
-            #Goes through all the images of Normal and Phenumonia images
-            for img_name in os.listdir(class_path):
-                self.image_paths.append(os.path.join(class_path, img_name))
-                if label_dir == 'NORMAL':
-                    self.labels.append(0)
-                elif 'bacteria' in img_name.lower():
-                    self.labels.append(1)
-                else:
-                    self.labels.append(2)
-
+        # Transforms for pretrained models (AlexNet, VGG16, etc.)
+        self.transform = transforms.Compose(
+            [
+                transforms.Resize((224, 224)),
+                transforms.Grayscale(num_output_channels=3),
+                transforms.ToTensor(),
+                transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+            ]
+        )
 
     def __len__(self) -> int:
         """Return the length of the dataset."""
-        return len(self.image_paths)
+        return len(self.samples)
 
-    def __getitem__(self, index: int):
-        """Return a tuple consisting of a image and a label from the dataset."""
-        img = Image.open(self.image_paths[index]).convert('RGB')
-        if self.transform: img = self.transform(img)
-        return img, self.labels[index]
-        #return self.image_paths[index], self.image_paths[index]
+    def __getitem__(self, index: int) -> tuple[torch.Tensor, int]:
+        """Return a given sample from the dataset."""
+        image = Image.open(self.samples[index]).convert("RGB")
+        return self.transform(image), self.labels[index]
 
     def preprocess(self, output_folder: Path) -> None:
         """Preprocess the raw data and save it to the output folder."""
-        images, targets = [], []
+        raw_path = output_folder.parent / "raw"
+        chest_xray_path = raw_path / "chest_xray"
 
-        for index in range(len(self.image_paths)):
-            img = Image.open(self.image_paths[index]).convert('RGB')
-            if self.transform: img = self.transform(img)
+        # Download if needed
+        if not chest_xray_path.exists():
+            print("Downloading from Kaggle (requires ~/.kaggle/kaggle.json)...")
+            raw_path.mkdir(parents=True, exist_ok=True)
+            kaggle.api.dataset_download_files("paultimothymooney/chest-xray-pneumonia", path=raw_path, unzip=True)
 
-            images.append(torch.load(self.image_paths[index]))
-            targets.append(torch.load(self.labels[index]))
+        # Copy to processed folder
+        output_folder.mkdir(parents=True, exist_ok=True)
+        for split in ["train", "val", "test"]:
+            src, dst = chest_xray_path / split, output_folder / split
+            if src.exists() and not dst.exists():
+                shutil.copytree(src, dst)
 
-        images = torch.cat(images)
-        targets = torch.cat(targets)
-
-        images = torch.cat(images).unsqueeze(1).float()
-        targets = torch.cat(targets).unsqueeze(1).float()
-
-        #Writes cleaned tensors to the processed_dir.
-        torch.save(images, f"{output_folder}/train_images.pt")
-        torch.save(targets, f"{output_folder}/train_target.pt")
-
-
-
-# Image Transformations
-transform = transforms.Compose([
-    transforms.Resize((300, 300)),
-    transforms.ToTensor(),
-    transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-])
-
-
-
+        print("✓ Data ready!")
 
 
 
 def preprocess(data_path: Path, output_folder: Path) -> None:
+    """Preprocess data."""
     print("Preprocessing data...")
+
+    dataset = ChestXRayDataset(data_path)
+    dataset.preprocess(output_folder)
+
 
     datasets = get_pneumonia_datasets()
     for dataset in datasets:

@@ -1,0 +1,13 @@
+# Ruff configuration for code quality (M7)
+[lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+    "UP",  # pyupgrade
+]
+
+[format]
+quote-style = "double"
