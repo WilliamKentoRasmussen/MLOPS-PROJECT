@@ -3,13 +3,16 @@
 import shutil
 from pathlib import Path
 
-
-import kaggle
 import torch
 import typer
 from PIL import Image
 from torch.utils.data import Dataset
 from torchvision import transforms
+
+import kagglehub
+
+
+
 
 
 class ChestXRayDataset(Dataset):
@@ -51,14 +54,17 @@ class ChestXRayDataset(Dataset):
 
     def preprocess(self, output_folder: Path) -> None:
         """Preprocess the raw data and save it to the output folder."""
-        raw_path = output_folder.parent / "raw"
-        chest_xray_path = raw_path / "chest_xray"
 
-        # Download if needed
+        # Download (cached automatically)
+        print("Downloading (or reusing cache) from KaggleHub...")
+        dataset_path = Path(
+            kagglehub.dataset_download("paultimothymooney/chest-xray-pneumonia")
+        )
+
+        chest_xray_path = dataset_path / "chest_xray"
+
         if not chest_xray_path.exists():
-            print("Downloading from Kaggle (requires ~/.kaggle/kaggle.json)...")
-            raw_path.mkdir(parents=True, exist_ok=True)
-            kaggle.api.dataset_download_files("paultimothymooney/chest-xray-pneumonia", path=raw_path, unzip=True)
+            raise FileNotFoundError("Expected 'chest_xray' folder not found in dataset.")
 
         # Copy to processed folder
         output_folder.mkdir(parents=True, exist_ok=True)
@@ -71,42 +77,15 @@ class ChestXRayDataset(Dataset):
 
 
 
+
 def preprocess(data_path: Path, output_folder: Path) -> None:
     """Preprocess data."""
     print("Preprocessing data...")
-
     dataset = ChestXRayDataset(data_path)
     dataset.preprocess(output_folder)
 
 
-    datasets = get_pneumonia_datasets()
-    for dataset in datasets:
-        dataset.preprocess(output_folder)
-
-
-def get_pneumonia_datasets():
-    """
-    Returns a tuple of the pneumonia dataset in this order train_ds, test_ds, val_ds
-    """""
-    train_ds = PneumoniaDataset('data/chest_xray/train', transform=transform)
-    test_ds = PneumoniaDataset('data/chest_xray/test', transform=transform)
-    val_ds = PneumoniaDataset('data/chest_xray/val', transform=transform)
-
-    return train_ds, test_ds, val_ds
 
 if __name__ == "__main__":
-    #typer.run(preprocess)
-
-    train_ds = PneumoniaDataset('data/chest_xray/train', transform=transform)
-    test_ds = PneumoniaDataset('data/chest_xray/test', transform=transform)
-    val_ds = PneumoniaDataset('data/chest_xray/val', transform=transform)
-
-    train_loader = DataLoader(train_ds, batch_size=2, shuffle=True) ##Only gives one image if batch_size = 1
-    test_loader = DataLoader(test_ds, batch_size=2, shuffle=False)
-    val_loader = DataLoader(test_ds, batch_size=2, shuffle=False)
-
-    print(f"Loaded {len(train_ds)} training images, {len(val_ds)} validation images, and {len(test_ds)} testing images.")
-    for images, labels in train_loader:
-        print("Batch of images shape:", images.shape)  # Should be [batch_size, 3, 300, 300]
-        print("Batch of labels shape:", labels.shape)  # Should be [batch_size]
-        break
+    typer.run(preprocess)
+    ## Run it using uv run src/main_project/data.py data/raw data/processed
