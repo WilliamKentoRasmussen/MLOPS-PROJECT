@@ -1,0 +1,18 @@
+# Main Hydra configuration for Chest X-Ray classification
+defaults:
+  - model: baseline
+  - training: default
+  - _self_
+
+# Data paths
+data:
+  root: "data/processed"
+  num_workers: 2
+
+# Device configuration
+device: auto  # auto, cuda, mps, or cpu
+
+# Output directories
+output:
+  models_dir: "models"
+  logs_dir: "logs"
