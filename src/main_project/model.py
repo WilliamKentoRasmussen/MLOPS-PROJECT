@@ -88,6 +88,10 @@ def get_model(model_name: str = "baseline", num_classes: int = 2, pretrained: bo
         raise ValueError(f"Unknown model: {model_name}. Choose 'baseline', 'alexnet', or 'vgg16'")
 
 
+        return x
+
+
+# Test with your dimensions
 if __name__ == "__main__":
     # Test models
     print("Testing model architectures...\n")
