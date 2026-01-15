@@ -1,0 +1,79 @@
+_wandb:
+    value:
+        cli_version: 0.23.1
+        e:
+            pj4fjseiw71ut74qga6tgen5qooradle:
+                apple:
+                    ecpuCores: 4
+                    gpuCores: 10
+                    memoryGb: 16
+                    name: Apple M3
+                    pcpuCores: 4
+                    ramTotalBytes: "17179869184"
+                    swapTotalBytes: "3221225472"
+                codePath: src/main_project/train.py
+                codePathLocal: src/main_project/train.py
+                cpu_count: 8
+                cpu_count_logical: 8
+                disk:
+                    /:
+                        total: "494384795648"
+                        used: "307601285120"
+                email: s245310@dtu.dk
+                executable: /Users/kento/Documents/DTU/Semester04/MLOps/MLOPS-PROJECT/.venv/bin/python
+                git:
+                    commit: ba14361b4de19f53c8f4d8ed801c8b9f960091bb
+                    remote: https://github.com/WilliamKentoRasmussen/MLOPS-PROJECT.git
+                host: airtilhewilliam.students.clients.local
+                memory:
+                    total: "17179869184"
+                os: macOS-14.5-arm64-arm-64bit
+                program: /Users/kento/Documents/DTU/Semester04/MLOps/MLOPS-PROJECT/src/main_project/train.py
+                python: CPython 3.12.11
+                root: /Users/kento/Documents/DTU/Semester04/MLOps/MLOPS-PROJECT
+                startedAt: "2026-01-15T09:56:28.837885Z"
+                writerId: pj4fjseiw71ut74qga6tgen5qooradle
+        m: []
+        python_version: 3.12.11
+        t:
+            "1":
+                - 1
+                - 41
+                - 50
+                - 105
+            "2":
+                - 1
+                - 41
+                - 50
+                - 105
+            "3":
+                - 2
+                - 3
+                - 13
+                - 15
+                - 16
+            "4": 3.12.11
+            "5": 0.23.1
+            "12": 0.23.1
+            "13": darwin-arm64
+data:
+    value:
+        num_workers: 2
+        root: data/processed
+device:
+    value: auto
+model:
+    value:
+        name: baseline
+        num_classes: 2
+        pretrained: false
+output:
+    value:
+        logs_dir: logs
+        models_dir: models
+training:
+    value:
+        batch_size: 32
+        epochs: 10
+        lr: 0.001
+        patience: 5

@@ -1,0 +1,37 @@
+{
+  "os": "macOS-14.5-arm64-arm-64bit",
+  "python": "CPython 3.12.11",
+  "startedAt": "2026-01-15T09:56:28.837885Z",
+  "program": "/Users/kento/Documents/DTU/Semester04/MLOps/MLOPS-PROJECT/src/main_project/train.py",
+  "codePath": "src/main_project/train.py",
+  "codePathLocal": "src/main_project/train.py",
+  "git": {
+    "remote": "https://github.com/WilliamKentoRasmussen/MLOPS-PROJECT.git",
+    "commit": "ba14361b4de19f53c8f4d8ed801c8b9f960091bb"
+  },
+  "email": "s245310@dtu.dk",
+  "root": "/Users/kento/Documents/DTU/Semester04/MLOps/MLOPS-PROJECT",
+  "host": "airtilhewilliam.students.clients.local",
+  "executable": "/Users/kento/Documents/DTU/Semester04/MLOps/MLOPS-PROJECT/.venv/bin/python",
+  "cpu_count": 8,
+  "cpu_count_logical": 8,
+  "disk": {
+    "/": {
+      "total": "494384795648",
+      "used": "307601285120"
+    }
+  },
+  "memory": {
+    "total": "17179869184"
+  },
+  "apple": {
+    "name": "Apple M3",
+    "ecpuCores": 4,
+    "pcpuCores": 4,
+    "gpuCores": 10,
+    "memoryGb": 16,
+    "swapTotalBytes": "3221225472",
+    "ramTotalBytes": "17179869184"
+  },
+  "writerId": "pj4fjseiw71ut74qga6tgen5qooradle"
+}

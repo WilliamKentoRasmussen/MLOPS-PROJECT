@@ -184,10 +184,11 @@ cython_debug/
 /data
 
 # MLOps-specific
+wandb/
+outputs/
 models/*.pth
 models/*.pt
 data/raw/
 data/processed/
 outputs/  # Hydra output directories
 .dvc/tmp/
-

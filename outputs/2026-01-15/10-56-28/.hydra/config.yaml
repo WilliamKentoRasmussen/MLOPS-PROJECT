@@ -1,0 +1,16 @@
+model:
+  name: baseline
+  num_classes: 2
+  pretrained: false
+training:
+  epochs: 10
+  batch_size: 32
+  lr: 0.001
+  patience: 5
+data:
+  root: data/processed
+  num_workers: 2
+device: auto
+output:
+  models_dir: models
+  logs_dir: logs
