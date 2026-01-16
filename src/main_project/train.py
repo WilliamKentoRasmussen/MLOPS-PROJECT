@@ -12,6 +12,8 @@ import wandb
 from main_project.data import ChestXRayDataset
 from main_project.model import get_model
 
+from torch.profiler import profile, ProfilerActivity
+
 
 @hydra.main(version_base=None, config_path="../../configs", config_name="config")
 def train(cfg: DictConfig) -> None:
@@ -72,86 +74,102 @@ def train(cfg: DictConfig) -> None:
     best_val_acc = 0.0
     epochs_without_improvement = 0
 
-    for epoch in range(cfg.training.epochs):
-        # Train
-        model.train()
-        train_loss, train_correct, train_total = 0.0, 0, 0
+    # Profiling the training process
+    with profile(activities=[ProfilerActivity.CPU], 
+                             record_shapes=True) as prof:
 
-        for images, labels in train_loader:
-            images, labels = images.to(device), labels.to(device)
+        for epoch in range(cfg.training.epochs):
+            # Train
+            model.train()
+            train_loss, train_correct, train_total = 0.0, 0, 0
 
-            optimizer.zero_grad()
-            outputs = model(images)
-            loss = criterion(outputs, labels)
-            loss.backward()
-            optimizer.step()
-
-            train_loss += loss.item()
-            train_correct += (outputs.argmax(1) == labels).sum().item()
-            train_total += labels.size(0)
-
-        train_acc = 100 * train_correct / train_total
-        train_loss_avg = train_loss / len(train_loader)
-
-        # Validate
-        model.eval()
-        val_loss, val_correct, val_total = 0.0, 0, 0
-
-        with torch.no_grad():
-            for images, labels in val_loader:
+            for images, labels in train_loader:
                 images, labels = images.to(device), labels.to(device)
+
+                optimizer.zero_grad()
                 outputs = model(images)
                 loss = criterion(outputs, labels)
+                loss.backward()
+                optimizer.step()
 
-                val_loss += loss.item()
-                val_correct += (outputs.argmax(1) == labels).sum().item()
-                val_total += labels.size(0)
+                train_loss += loss.item()
+                train_correct += (outputs.argmax(1) == labels).sum().item()
+                train_total += labels.size(0)
 
-        val_acc = 100 * val_correct / val_total
-        val_loss_avg = val_loss / len(val_loader)
+                prof.step() # Step the profiler for each batch
 
-        # Log metrics to W&B
-        wandb.log(
-            {
-                "epoch": epoch + 1,
-                "train/loss": train_loss_avg,
-                "train/accuracy": train_acc,
-                "val/loss": val_loss_avg,
-                "val/accuracy": val_acc,
-            }
-        )
+            train_acc = 100 * train_correct / train_total
+            train_loss_avg = train_loss / len(train_loader)
 
-        print(
-            f"Epoch {epoch+1}/{cfg.training.epochs} | "
-            f"Train Loss: {train_loss_avg:.4f}, Acc: {train_acc:.2f}% | "
-            f"Val Loss: {val_loss_avg:.4f}, Acc: {val_acc:.2f}%"
-        )
+            # Validate
+            model.eval()
+            val_loss, val_correct, val_total = 0.0, 0, 0
 
-        # Save best model and check early stopping
-        if val_acc > best_val_acc:
-            best_val_acc = val_acc
-            epochs_without_improvement = 0
-            Path(cfg.output.models_dir).mkdir(exist_ok=True)
-            model_path = f"{cfg.output.models_dir}/{cfg.model.name}_best.pth"
-            torch.save(model.state_dict(), model_path)
+            with torch.no_grad():
+                for images, labels in val_loader:
+                    images, labels = images.to(device), labels.to(device)
+                    outputs = model(images)
+                    loss = criterion(outputs, labels)
 
-            # Log best model to W&B
-            wandb.log({"best_val_accuracy": best_val_acc})
-            wandb.save(model_path)
+                    val_loss += loss.item()
+                    val_correct += (outputs.argmax(1) == labels).sum().item()
+                    val_total += labels.size(0)
 
-            print(f"  → Saved best model (val_acc: {val_acc:.2f}%)")
-        else:
-            epochs_without_improvement += 1
-            print(f"  → No improvement ({epochs_without_improvement}/{cfg.training.patience})")
+            val_acc = 100 * val_correct / val_total
+            val_loss_avg = val_loss / len(val_loader)
 
-            if epochs_without_improvement >= cfg.training.patience:
-                print(
-                    f"\n⚠ Early stopping triggered after {epoch+1} epochs (no improvement for {cfg.training.patience} epochs)"
-                )
-                break
+            # Log metrics to W&B
+            wandb.log(
+                {
+                    "epoch": epoch + 1,
+                    "train/loss": train_loss_avg,
+                    "train/accuracy": train_acc,
+                    "val/loss": val_loss_avg,
+                    "val/accuracy": val_acc,
+                }
+            )
+
+            print(
+                f"Epoch {epoch+1}/{cfg.training.epochs} | "
+                f"Train Loss: {train_loss_avg:.4f}, Acc: {train_acc:.2f}% | "
+                f"Val Loss: {val_loss_avg:.4f}, Acc: {val_acc:.2f}%"
+            )
+
+            # Save best model and check early stopping
+            if val_acc > best_val_acc:
+                best_val_acc = val_acc
+                epochs_without_improvement = 0
+                Path(cfg.output.models_dir).mkdir(exist_ok=True)
+                model_path = f"{cfg.output.models_dir}/{cfg.model.name}_best.pth"
+                torch.save(model.state_dict(), model_path)
+
+                # Log best model to W&B
+                wandb.log({"best_val_accuracy": best_val_acc})
+                wandb.save(model_path)
+
+                print(f"  → Saved best model (val_acc: {val_acc:.2f}%)")
+            else:
+                epochs_without_improvement += 1
+                print(f"  → No improvement ({epochs_without_improvement}/{cfg.training.patience})")
+
+                if epochs_without_improvement >= cfg.training.patience:
+                    print(
+                        f"\n⚠ Early stopping triggered after {epoch+1} epochs (no improvement for {cfg.training.patience} epochs)"
+                    )
+                    break
 
     print(f"\n✓ Training complete! Best val accuracy: {best_val_acc:.2f}%")
     print(f"Model saved to: {cfg.output.models_dir}/{cfg.model.name}_best.pth")
+
+    # Add profiling results
+    print("\n== Profiling Results ==")
+    print(prof.key_averages().table(sort_by="cpu_time_total", row_limit=10))
+    
+    # Export trace for Chrome visualization
+    trace_path = f"{cfg.output.models_dir}/trace.json"
+    prof.export_chrome_trace(trace_path)
+    print(f"\nChrome trace saved to: {trace_path}")
+    print("Open in Chrome: ui.perfetto.dev → Load → select trace.json")
 
     # Finish W&B run
     wandb.finish()
