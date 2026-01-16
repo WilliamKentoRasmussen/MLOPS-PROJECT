@@ -1,5 +1,5 @@
 # Default training configuration
-epochs: 10
+epochs: 2
 batch_size: 32
 lr: 0.001
 patience: 5  # Early stopping patience

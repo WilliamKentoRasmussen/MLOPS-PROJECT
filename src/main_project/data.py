@@ -1,18 +1,15 @@
 """Data loading and preprocessing for Chest X-Ray Pneumonia dataset."""
 
+import os
 import shutil
 from pathlib import Path
 
+import kagglehub
 import torch
 import typer
 from PIL import Image
 from torch.utils.data import Dataset
 from torchvision import transforms
-
-import kagglehub
-
-
-
 
 
 class ChestXRayDataset(Dataset):

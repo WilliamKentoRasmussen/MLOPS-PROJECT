@@ -1,17 +1,16 @@
 """Unit tests for the data module."""
 
-from pathlib import Path
-import tempfile
-import shutil
 import os
+import shutil
+import tempfile
+from pathlib import Path
 
+import numpy as np
 import pytest
 import torch
-from torch.utils.data import Dataset
-from PIL import Image
-import numpy as np
-
 from main_project.data import ChestXRayDataset
+from PIL import Image
+from torch.utils.data import Dataset
 
 # Test configuration
 _TEST_ROOT = os.path.dirname(__file__)
