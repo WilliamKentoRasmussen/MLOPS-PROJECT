@@ -165,7 +165,7 @@ class PredictionResponse(BaseModel):
 async def root():
     """Root endpoint with API information."""
     return {
-        "message": "Chest X-Ray Classification API",
+        "message": "Welcome to the Chest X-Ray Classification API",
         "version": "1.0.0",
         "endpoints": {
             "docs": "/docs",
