@@ -7,7 +7,7 @@ defaults:
 # Data paths
 data:
   root: "data/processed"
-  num_workers: 2
+  num_workers: 0
 
 # Device configuration
 device: auto  # auto, cuda, mps, or cpu
