@@ -4,4 +4,4 @@ workerPoolSpecs:
         machineType: n1-highmem-2
     replicaCount: 1
     containerSpec:
-        imageUri: us-west1-b-docker.pkg.dev/mlops-project-484509/mlops-project-artifacts/mlops-train-image:latest
+        imageUri: europe-west1-docker.pkg.dev/mlops-project-484509/mlops-project-artifacts/mlops-train-image:latest
