@@ -387,7 +387,7 @@ While good coding practices may seem less important in solo projects, they becom
 >
 > Answer:
 
---- question 17 fill here ---
+We used the following service: Artifacts, Cloud Build, Cloud Run, and Vertex AI. Artifacts is used for storing our docker images. We implemented an automatic trigger in cloud build to automaticly build images in the cloud and upload them to artifacts. Moreover, we used the Bucket service to store our trained pytorch models as well as the processed pneumonia Data consisting of jpeg images. The cloud run was used to run our backend for our api and Vertex ai was used to train our images.
 
 ### Question 18
 
@@ -402,7 +402,9 @@ While good coding practices may seem less important in solo projects, they becom
 >
 > Answer:
 
---- question 18 fill here ---
+We used the compute engine to run the training of our models inside the vertex ai. We used the following hardware: CPU and we started the dockerfile on our computer.
+
+
 
 ### Question 19
 
@@ -411,7 +413,9 @@ While good coding practices may seem less important in solo projects, they becom
 >
 > Answer:
 
---- question 19 fill here ---
+![my_image](figures/bucket.png)
+![my_image](figures/inside_bucket.png)
+
 
 ### Question 20
 
@@ -420,7 +424,8 @@ While good coding practices may seem less important in solo projects, they becom
 >
 > Answer:
 
---- question 20 fill here ---
+![alt text](image-1.png)
+[alt text](image.png)
 
 ### Question 21
 

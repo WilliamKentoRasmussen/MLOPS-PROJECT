@@ -42,4 +42,8 @@ RUN uv sync --frozen
 EXPOSE 8000
 
 # Change entrypoint to run your FastAPI app instead of training
-ENTRYPOINT ["uv", "run", "src/main_project/backend.py"]
+#ENTRYPOINT ["uv", "run", "src/main_project/backend.py"]
+
+
+
+ENTRYPOINT ["uv", "run", "uvicorn", "src.main_project.backend:app", "--host", "0.0.0.0", "--port", "8000"]
