@@ -37,10 +37,12 @@ dependencies = [
     "torch-tb-profiler>=0.4.3",
     "python-multipart>=0.0.6",
     "fastapi>=0.104.0",
-    "torch>=2.3.0",  # Version with better ARM support
+    "torch>=2.3.0", # Version with better ARM support
     "torchvision>=0.18.0",
     "omegaconf>=2.3.0",
     "pydantic>=2.4.0",
+    "markdown>=3.10",
+    "loguru>=0.7.3",
 ]
 
 [dependency-groups]
