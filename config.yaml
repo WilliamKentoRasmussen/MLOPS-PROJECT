@@ -5,3 +5,6 @@ workerPoolSpecs:
     replicaCount: 1
     containerSpec:
         imageUri: europe-west1-docker.pkg.dev/mlops-project-484509/mlops-project-artifacts/mlops-train-image:latest
+        env:
+        - name: WANDB_API_KEY
+          value: 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

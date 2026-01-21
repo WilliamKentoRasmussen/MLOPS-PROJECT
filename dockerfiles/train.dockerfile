@@ -16,4 +16,4 @@ RUN uv sync --frozen --no-install-project
 
 # RUN uv sync --frozen
 
-ENTRYPOINT ["uv", "run", "src/main_project/train.py"]
+ENTRYPOINT ["uv", "run", "src/main_project/cloud_train.py"]
