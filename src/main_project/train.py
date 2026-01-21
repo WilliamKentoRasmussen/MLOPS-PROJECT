@@ -1,5 +1,6 @@
 """Training script for Chest X-Ray classification."""
 
+import os
 from pathlib import Path
 
 import hydra
@@ -75,7 +76,7 @@ def train(cfg: DictConfig) -> None:
     epochs_without_improvement = 0
 
     # Profiling the training process
-    with profile(activities=[ProfilerActivity.CPU], 
+    with profile(activities=[ProfilerActivity.CPU],
                              record_shapes=True) as prof:
 
         for epoch in range(cfg.training.epochs):
@@ -141,7 +142,10 @@ def train(cfg: DictConfig) -> None:
                 epochs_without_improvement = 0
                 Path(cfg.output.models_dir).mkdir(exist_ok=True)
                 model_path = f"{cfg.output.models_dir}/{cfg.model.name}_best.pth"
+                model_cloud_path = f"{cfg.output.models_dir}/{cfg.model.name}_cloud.pth"
+                torch.save(model, model_cloud_path)
                 torch.save(model.state_dict(), model_path)
+
 
                 # Log best model to W&B
                 wandb.log({"best_val_accuracy": best_val_acc})
@@ -164,7 +168,7 @@ def train(cfg: DictConfig) -> None:
     # Add profiling results
     print("\n== Profiling Results ==")
     print(prof.key_averages().table(sort_by="cpu_time_total", row_limit=10))
-    
+
     # Export trace for Chrome visualization
     trace_path = f"{cfg.output.models_dir}/trace.json"
     prof.export_chrome_trace(trace_path)

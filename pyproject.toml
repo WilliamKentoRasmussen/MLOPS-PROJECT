@@ -37,6 +37,7 @@ dependencies = [
     "dvc-gs>=3.0.2",
     "torch-tb-profiler>=0.4.3",
     "python-multipart>=0.0.6",
+    "loguru>=0.7.3",
 ]
 
 [dependency-groups]
