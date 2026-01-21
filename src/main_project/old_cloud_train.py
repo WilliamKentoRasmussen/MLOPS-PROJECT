@@ -5,7 +5,7 @@ import hydra
 import torch
 from omegaconf import DictConfig, OmegaConf
 from torch import nn
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, TensorDataset
 import wandb
 from main_project.model import get_model
 from torch.profiler import profile, ProfilerActivity
@@ -13,20 +13,16 @@ from google.cloud import storage
 import os
 from main_project.data import ChestXRayDataset
 
-def download_folder_from_gcs(bucket_name: str, gcs_prefix: str, local_dest: Path):
-    """Download all files from a GCS folder prefix to a local folder."""
+def download_from_gcs(bucket_name, source_blob_name, destination_file_name):
     client = storage.Client()
     bucket = client.bucket(bucket_name)
-    blobs = bucket.list_blobs(prefix=gcs_prefix)  # list all objects under the folder
+    blob = bucket.blob(source_blob_name)
+    os.makedirs(os.path.dirname(destination_file_name), exist_ok=True)
+    blob.download_to_filename(destination_file_name)
 
-    for blob in blobs:
-        if blob.name.endswith("/"):
-            continue  # skip folders
-        # compute relative path inside the folder
-        rel_path = Path(blob.name).relative_to(gcs_prefix)
-        local_file_path = local_dest / rel_path
-        local_file_path.parent.mkdir(parents=True, exist_ok=True)
-        blob.download_to_filename(local_file_path)
+
+
+
 
 @hydra.main(version_base=None, config_path="../../configs", config_name="config")
 def train(cfg: DictConfig) -> None:
@@ -50,34 +46,31 @@ def train(cfg: DictConfig) -> None:
         device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
     print(f"\nUsing device: {device}")
 
-    # --- DOWNLOAD DATA FROM GCS ---
+    # LOAD DATA DIRECTLY FROM GCS
     gcs_bucket = "mlops-project-pneumonia-bucket"
-    local_data_root = Path("data/processed")
 
-    # Download train and val folders
-    print("Downloading train and val folders from GCS...")
-    download_folder_from_gcs(gcs_bucket, "processed/train", local_data_root / "train")
-    download_folder_from_gcs(gcs_bucket, "processed/val",   local_data_root / "val")
-    print("✓ Data downloaded")
+    local_train_path = "data/processed/train.pt"
+    local_val_path   = "data/processed/val.pt"
 
-    print("=== TRAIN TREE ===")
-    os.system("find data/processed/train | head -n 20")
+    download_from_gcs(gcs_bucket, "processed/train.pt", local_train_path)
+    download_from_gcs(gcs_bucket, "processed/val.pt",   local_val_path)
 
-    print("=== VAL TREE ===")
-    os.system("find data/processed/val | head -n 20")
-
-    print("VAL NORMAL:", os.listdir("data/processed/val/NORMAL") if os.path.exists("data/processed/val/NORMAL") else "MISSING")
-    print("VAL PNEUMONIA:", os.listdir("data/processed/val/PNEUMONIA") if os.path.exists("data/processed/val/PNEUMONIA") else "MISSING")
+    train_data = torch.load(local_train_path)
+    val_data   = torch.load(local_val_path)
 
 
-    # --- CREATE DATASETS AND LOADERS ---
-    train_dataset = ChestXRayDataset(local_data_root, split="train")
-    val_dataset   = ChestXRayDataset(local_data_root, split="val")
+    # Wrap in DataLoader
+    train_loader = DataLoader(TensorDataset(*zip(*train_data)),
+                              batch_size=cfg.training.batch_size, shuffle=True)
+    val_loader = DataLoader(TensorDataset(*zip(*val_data)),
+                            batch_size=cfg.training.batch_size)
 
-    train_loader = DataLoader(train_dataset, batch_size=cfg.training.batch_size, shuffle=True)
-    val_loader   = DataLoader(val_dataset, batch_size=cfg.training.batch_size)
 
-    print(f"Train samples: {len(train_dataset)}, Val samples: {len(val_dataset)}")
+
+
+
+
+    print(f"Train samples: {len(train_data)}, Val samples: {len(val_data)}")
 
     # --- MODEL ---
     print(f"\nCreating {cfg.model.name} model...")
@@ -151,10 +144,7 @@ def train(cfg: DictConfig) -> None:
                   f"Train Loss: {train_loss_avg:.4f}, Acc: {train_acc:.2f}% | "
                   f"Val Loss: {val_loss_avg:.4f}, Acc: {val_acc:.2f}%")
 
-
             # Early stopping & save best model directly to GCS
-
-            #replace with the correct saving technic
             Path("/gcs/mlops-project-pneumonia-bucket/outputs/models").mkdir(parents=True, exist_ok=True)
             model_path = Path("/gcs/mlops-project-pneumonia-bucket/outputs/models") / f"{cfg.model.name}_best.pth"
 
