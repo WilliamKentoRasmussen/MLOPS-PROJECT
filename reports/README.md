@@ -187,12 +187,11 @@ To obtain a complete copy of our development environment, a new team member woul
 >
 > Answer:
 
-We used the cookiecutter tool for project template. We used the custom MLOps template given by the course as jumping point for the rest of our project. 
+We initialized our project using the course-provided Cookiecutter MLOps template, which served as structured starting point for organizing our codebase. From the template, we primarily filled out source directory ('src'), chich containts the core implementation of our project. This folder represents the main workflow of our machine learning pipeline.
 
-From the cookiecutter template we have filled out the source code folder, which containts the bulk of the main code, including data preprocessing, our models, training and evalution. Our data folder is not shown the raw data is directly preprocessed from kaggle... 
+The data directory does store contain raw datasets directly in the repository. Instead, raw data is sourced programmatically from kaggle and tracked using DVC. The .dvc directory contains metadata files that refrence versioned data stored externally.
 
-from the orignial template we removed notebooks ... Furthermore we added config folder. 
-we add config folder... and removed notebooks ...
+To improve configuration and reproducability, we added a config directory for managing model and pipeline parameters, as well as .devcontainer directory. We also removed the notebooks directory, as our workflow relied on script-based development rather than interactive notebooks. 
 
 ### Question 6
 
