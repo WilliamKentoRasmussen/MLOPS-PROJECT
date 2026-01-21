@@ -1,18 +1,20 @@
 from fastapi.testclient import TestClient
+
 from src.main_project.api import app
+
 client = TestClient(app)
 def test_read_root():
     """Test root endpoint returns correct API information."""
     response = client.get("/")
-    
+
     assert response.status_code == 200
     data = response.json()
-    
+
     # Check structure of response
     assert "message" in data
     assert "version" in data
     assert "endpoints" in data
-    
+
     # Check endpoints list
     endpoints = data["endpoints"]
     expected_endpoints = ["docs", "health", "models", "predict", "predict_batch"]
@@ -22,15 +24,15 @@ def test_read_root():
 def test_health_check():
     """Test health endpoint."""
     response = client.get("/health")
-    
+
     assert response.status_code == 200
     data = response.json()
-    
+
     # Basic health check
     assert data["status"] == "healthy"
     assert "device" in data
     assert "available_models" in data
-    
+
     # Models directory info (exists might be True or False)
     assert "models_directory" in data
     assert "models_exist" in data  # This could be True or False!
@@ -40,10 +42,10 @@ def test_health_check():
 def test_list_models():
     """Test models listing endpoint."""
     response = client.get("/models")
-    
+
     assert response.status_code == 200
     data = response.json()
-    
+
     # Check response structure
     assert "available_models" in data
     assert isinstance(data["available_models"], list)
@@ -58,7 +60,7 @@ def test_list_models():
     for model in expected_models:
         assert model in data["available_models"]
         assert model in data["models"]
-        
+
         # Check model info structure
         model_info = data["models"][model]
         assert "path" in model_info
@@ -68,10 +70,10 @@ def test_list_models():
 def test_model_info_default():
     """Test model info endpoint with default model."""
     response = client.get("/info")
-    
+
     assert response.status_code == 200
     data = response.json()
-    
+
     # Check response structure
     assert "model_name" in data
     assert data["model_name"] == "baseline"  # Default
@@ -82,10 +84,10 @@ def test_model_info_default():
     assert "device" in data
     assert "model_path" in data
     assert "file_exists" in data
-    
 
 
-    
+
+
 
 
 

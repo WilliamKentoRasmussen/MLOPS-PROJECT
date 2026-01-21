@@ -2,9 +2,8 @@
 
 import pytest
 import torch
-from torch import nn
-
 from main_project.model import BaselineCNN, get_model
+from torch import nn
 
 
 class TestBaselineCNN:

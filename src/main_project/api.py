@@ -48,7 +48,7 @@ if MODELS_DIR.exists():
     model_files = list(MODELS_DIR.glob("*.pth"))
     print(f"Found model files: {model_files}")
 else:
-    print(f"WARNING: Models directory does not exist!")
+    print("WARNING: Models directory does not exist!")
     print(f"Looking in: {MODELS_DIR}")
 print(f"{'='*80}\n")
 
@@ -87,10 +87,10 @@ def get_model_path(model_name: str) -> Path:
 def preprocess_image(image_data: bytes) -> torch.Tensor:
     """
     Preprocess uploaded image using same pipeline as training data.
-    
+
     Args:
         image_data: Raw image bytes
-    
+
     Returns:
         Preprocessed image tensor ready for model
     """
@@ -105,44 +105,44 @@ def preprocess_image(image_data: bytes) -> torch.Tensor:
 def load_model(model_name: str) -> torch.nn.Module:
     """
     Load or retrieve cached model.
-    
+
     Args:
         model_name: Name of the model (baseline, alexnet, vgg16)
-    
+
     Returns:
         Loaded model in eval mode
     """
     if model_name not in AVAILABLE_MODELS:
         raise ValueError(f"Model must be one of {AVAILABLE_MODELS}")
-    
+
     # Return cached model if already loaded
     if model_name in loaded_models:
         print(f"✓ Using cached {model_name} model")
         return loaded_models[model_name]
-    
+
     try:
         model = get_model(model_name, num_classes=NUM_CLASSES, pretrained=False)
         model_path = get_model_path(model_name)
-        
+
         print(f"Loading model: {model_name}")
         print(f"Model path: {model_path}")
         print(f"Path exists: {model_path.exists()}")
-        
+
         if not model_path.exists():
             available_files = list(MODELS_DIR.glob("*")) if MODELS_DIR.exists() else []
             raise FileNotFoundError(
                 f"Model file not found: {model_path}\n"
                 f"Available files in {MODELS_DIR}: {available_files}"
             )
-        
+
         model.load_state_dict(torch.load(str(model_path), map_location=device))
         model = model.to(device)
         model.eval()
-        
+
         # Cache the model
         loaded_models[model_name] = model
         print(f"✓ Successfully loaded {model_name} from {model_path}")
-        
+
         return model
     except FileNotFoundError as e:
         print(f"✗ File error: {e}")
@@ -201,7 +201,7 @@ async def list_models():
             "exists": model_path.exists() if model_path else False,
             "loaded": model_name in loaded_models,
         }
-    
+
     return {
         "available_models": AVAILABLE_MODELS,
         "models": models_info,
@@ -215,18 +215,18 @@ async def list_models():
 async def model_info(model: str = Query("baseline", description="Model name")):
     """
     Get model information.
-    
+
     Args:
         model: Model name (baseline, alexnet, vgg16)
     """
     if model not in AVAILABLE_MODELS:
         raise HTTPException(
-            status_code=400, 
+            status_code=400,
             detail=f"Invalid model. Choose from: {AVAILABLE_MODELS}"
         )
-    
+
     model_path = get_model_path(model)
-    
+
     return {
         "model_name": model,
         "num_classes": NUM_CLASSES,
@@ -244,11 +244,11 @@ async def predict(
 ) -> PredictionResponse:
     """
     Predict classification for uploaded chest X-Ray image.
-    
+
     Args:
         file: Uploaded image file (JPG, PNG, JPEG)
         model: Model name (baseline, alexnet, vgg16)
-    
+
     Returns:
         PredictionResponse with predicted class and confidence
     """
@@ -257,20 +257,20 @@ async def predict(
             status_code=400,
             detail=f"Invalid model. Choose from: {AVAILABLE_MODELS}"
         )
-    
+
     try:
         loaded_model = load_model(model)
         image_data = await file.read()
         image_tensor = preprocess_image(image_data).to(device)
-        
+
         with torch.no_grad():
             outputs = loaded_model(image_tensor)
             probabilities = F.softmax(outputs, dim=1)[0]
             predicted_idx = probabilities.argmax().item()
             confidence = probabilities[predicted_idx].item()
-        
+
         prob_dict = {CLASS_NAMES[i]: float(probabilities[i].item()) for i in range(NUM_CLASSES)}
-        
+
         return PredictionResponse(
             model_used=model,
             predicted_class=CLASS_NAMES[predicted_idx],
@@ -278,7 +278,7 @@ async def predict(
             probabilities=prob_dict,
             success=True,
         )
-    
+
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except FileNotFoundError as e:
@@ -298,10 +298,10 @@ async def predict_batch(
             status_code=400,
             detail=f"Invalid model. Choose from: {AVAILABLE_MODELS}"
         )
-    
+
     results = []
     for file in files:
         result = await predict(file, model=model)
         results.append(result.model_dump())
-    
+
     return {"model_used": model, "predictions": results, "count": len(results)}

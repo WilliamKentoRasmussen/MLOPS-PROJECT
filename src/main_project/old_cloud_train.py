@@ -1,17 +1,19 @@
 """Training script for Chest X-Ray classification (Vertex AI ready)."""
 
+import os
 from pathlib import Path
+
 import hydra
 import torch
+from google.cloud import storage
 from omegaconf import DictConfig, OmegaConf
 from torch import nn
+from torch.profiler import ProfilerActivity, profile
 from torch.utils.data import DataLoader, TensorDataset
+
 import wandb
 from main_project.model import get_model
-from torch.profiler import profile, ProfilerActivity
-from google.cloud import storage
-import os
-from main_project.data import ChestXRayDataset
+
 
 def download_from_gcs(bucket_name, source_blob_name, destination_file_name):
     client = storage.Client()
@@ -169,7 +171,7 @@ def train(cfg: DictConfig) -> None:
     print("\n== Profiling Results ==")
     print(prof.key_averages().table(sort_by="cpu_time_total", row_limit=10))
     prof.export_chrome_trace(Path("/gcs/mlops-project-pneumonia-bucket/outputs/models") / "trace.json")
-    print(f"\nChrome trace saved to /gcs/mlops-project-pneumonia-bucket/outputs/models/trace.json")
+    print("\nChrome trace saved to /gcs/mlops-project-pneumonia-bucket/outputs/models/trace.json")
     wandb.finish()
 
 
