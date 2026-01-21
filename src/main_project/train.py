@@ -6,13 +6,12 @@ import hydra
 import torch
 from omegaconf import DictConfig, OmegaConf
 from torch import nn
+from torch.profiler import ProfilerActivity, profile
 from torch.utils.data import DataLoader
 
 import wandb
 from main_project.data import ChestXRayDataset
 from main_project.model import get_model
-
-from torch.profiler import profile, ProfilerActivity
 
 
 @hydra.main(version_base=None, config_path="../../configs", config_name="config")
@@ -75,7 +74,7 @@ def train(cfg: DictConfig) -> None:
     epochs_without_improvement = 0
 
     # Profiling the training process
-    with profile(activities=[ProfilerActivity.CPU], 
+    with profile(activities=[ProfilerActivity.CPU],
                              record_shapes=True) as prof:
 
         for epoch in range(cfg.training.epochs):
@@ -164,7 +163,7 @@ def train(cfg: DictConfig) -> None:
     # Add profiling results
     print("\n== Profiling Results ==")
     print(prof.key_averages().table(sort_by="cpu_time_total", row_limit=10))
-    
+
     # Export trace for Chrome visualization
     trace_path = f"{cfg.output.models_dir}/trace.json"
     prof.export_chrome_trace(trace_path)

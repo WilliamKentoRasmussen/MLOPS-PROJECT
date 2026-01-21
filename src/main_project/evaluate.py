@@ -6,7 +6,13 @@ from pathlib import Path
 import hydra
 import torch
 from omegaconf import DictConfig, OmegaConf
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
+from sklearn.metrics import (
+    accuracy_score,
+    classification_report,
+    f1_score,
+    precision_score,
+    recall_score,
+)
 from torch.utils.data import DataLoader
 
 from main_project.data import ChestXRayDataset
