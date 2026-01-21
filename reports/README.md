@@ -308,7 +308,14 @@ While good coding practices may seem less important in solo projects, they becom
 >
 > Answer:
 
---- question 12 fill here ---
+We configured training experiments using Hydra configuration files to separate model, training, and system settings. The config directory contains subfolders for model (e.g. Baseline, Alexnet, VGG16) and training (e.g., default and quick runs), each defining parameters such as architecture, learning rate, batch size, and epochs. A central config.yaml composes these components and specifies data paths, device selection, and output directories. Experiments are executed by selecting configurations at runtime, for example: 
+```bash
+python src/main_project/train.py model=baseline training=default
+```
+Hydra also allows for hyperparameters to be overridden from the command line, for example: 
+```bash
+python src/main_project/train.py training.epochs=20 training.lr=1e-4
+```
 
 ### Question 13
 
@@ -323,7 +330,11 @@ While good coding practices may seem less important in solo projects, they becom
 >
 > Answer:
 
---- question 13 fill here ---
+We ensured experiment reproducibility by combining configuration management, data versioning, and environment control. All experiments are configured using Hydra configuration files, which separate model, training, and system parameters. Whenever an experiment is run, Hydra automatically saves the fully resolved configuration for that run, ensuring that no parameter choices are lost and that each experiment can be tracked back to its exact settings. 
+
+Data reproducibility is handled using DVC. Rather than storing raw data in the repository we track data version through DVC metadata files, allowing experiment to be rerun with the same data version even as datasets evolve. Dependency reproducibility is ensured using uv, Where all python dependencies are declared and pinned in a lockfile committed to version control.
+
+To reproduce and experiment, one would restore the correct data using DVC, synchronize dependencies using uv, and rerun the training script with the same hydroconfiguration. Additionally, a devcontainer/Docker setup ensures a consistent development environment across machines, further reducing sources of variability.
 
 ### Question 14
 
@@ -340,7 +351,16 @@ While good coding practices may seem less important in solo projects, they becom
 >
 > Answer:
 
---- question 14 fill here ---
+![my_image](figures/WandB_1.png)
+![my_image](figures/WandB_2.png)
+
+We used Weights & Biases (W&B) to track and compare our machine learning experiments across different model architectures and training configurations. Each run corresponds to a specific model type allowing us to systematically evaluate perfromance differences. 
+
+As seen in the images above, we have tracked epochs, best validation accuracy, training loss, training accuracy, validation loss, and validation accuracy. Training metrics inform us about how well the model fits the training data, while validation metrics are critical for detecting overfitting and assessing generalization performance. In particular, validation accuracy serves as our primary model selection criterion, as it reflects perfromance on unseen data. we also logged best validaiton accuracy to esily compare the peak perfromance of the best runs. Additionally, we tracked epoch count to align metric across runs and ensure fair compairson when early stopping was triggered 
+
+Furthermore, System metrics were also tracked. These metrics are important from an MLOps perspective, as they provide insight into hardware efficiency, resource consumption, and potential bottlenecks during training. 
+
+By visualizing all metrics in W&B, we were able to compare models such as the baseline, AlexNet, and VGG16 side by side. THis enabled systematic comparison of model behavior and performance across experiments. It should be noted that the reported results do not reflect fully optimized hyperparameters, as the priority focus of this work was on implementing a reproducible and well-intrumented MLOps pipeline rather than maximizing model performance.  
 
 ### Question 15
 
@@ -370,7 +390,9 @@ While good coding practices may seem less important in solo projects, they becom
 >
 > Answer:
 
---- question 16 fill here ---
+Debugging method was dependent on group member. In general, when encountering bugs during experiment execution, We first attempted to identify the source of the problem by inserting print statements and inspecting intermediate outputs. For more complex or unclear errors, we made use of AI-assisted tools such as GitHub Copilot to help interpret error messages and suggest potential fixes. This iterative approach allowed us to quickly diagnose configuration issues. 
+
+In addition to debugging, we performed basic profiling of the training loop using Pytorch's built-in ```torch.profiler```. The profiler was used to measure CPU execution time during training, helping us identify potential performance bottlenecks in the data loading and forward/backward passes. Profiling results were exported and visualized using 'ui.perfetto.dev'. While the code is not assumed to be fully optimized, this profiling step provided insight into runtime behavior and profiling implementations.
 
 ## Working in the cloud
 
