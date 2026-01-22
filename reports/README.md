@@ -566,7 +566,7 @@ We used the compute engine to run the training of our models inside the vertex a
 >
 > Answer:
 
---- question 23 fill here ---
+We managed to write an API for our model both the backend and the frontend of the application through the use of fastapi and streamlit. We did the backend through creating several endpoints for checking the functionality of the app, as well as whether model directories were found but mainly an inference model that can do the classifications of a given chest-xray also with the option to choose which model the user wants the inference to be done. We also extended this to batch classification, the user can technically include a whole dataset into the interface which would receive classification for each of them. The API was containerized by docker images to upscale the. The frontend could connect with the backend url, providing a better user experience but kept as simple as possible.
 
 ### Question 24
 
@@ -612,7 +612,7 @@ We both used unit and load testing for the API. We implemented unit tests for th
 >
 > Answer:
 
---- question 26 fill here ---
+We were not able to implement monitoring in the majority but were able to include alerting which would send out alerts in situations where the amount of api calls went above a certain threshold. We would like to have monitoring implemented completely such that over time we could fx see if model accuracy was dropping substantially, hence preventing data drifting beforehand.Extending the metric alert system to logs as well created by the application, allowing for far easier debugging in the longer deployment of the API.
 
 ## Overall discussion of project
 
@@ -647,7 +647,7 @@ We both used unit and load testing for the API. We implemented unit tests for th
 >
 > Answer:
 
---- question 28 fill here ---
+Yes we implemented a frontend for our API, we did this because we wanted to imporve the the user interaction with the interface, also allowing for the division of the app hence only needing to scale backend technically isnt of course super applicable to the project . The frontend was able to receive the url from the backend, and display the inference. Frontend was implemented using streamlit and was also containerized by docker for deployment however we were unable to actually deploy this part to the cloud.
 
 ### Question 29
 
