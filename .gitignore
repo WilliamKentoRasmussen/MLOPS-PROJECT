@@ -192,3 +192,12 @@ data/raw/
 data/processed/
 outputs/  # Hydra output directories
 .dvc/tmp/
+
+# Generated monitoring & drift artifacts
+predictions.csv
+reference.csv
+src/main_project/drift_reports/
+
+# Profiling & experiment outputs
+models/trace.json
+multirun/

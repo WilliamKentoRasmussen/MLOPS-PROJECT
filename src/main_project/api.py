@@ -3,14 +3,16 @@
 from io import BytesIO
 from pathlib import Path
 
+import csv 
 import torch
 import torch.nn.functional as F
-from fastapi import FastAPI, File, HTTPException, Query, UploadFile
+from fastapi import FastAPI, File, HTTPException, Query, UploadFile, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from omegaconf import OmegaConf
 from PIL import Image
 from pydantic import BaseModel
 from torchvision import transforms
+from datetime import datetime, UTC
 
 from main_project.model import get_model
 
@@ -37,6 +39,17 @@ device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is
 SCRIPT_DIR = Path(__file__).resolve().parent  # /path/to/src/main_project
 PROJECT_ROOT = SCRIPT_DIR.parent.parent  # /path/to/MLOPS-PROJECT
 MODELS_DIR = PROJECT_ROOT/ "models"
+
+PREDICTIONS_CSV_PATH = PROJECT_ROOT / "predictions.csv" # To log predictions
+
+"""Append a prediction row to the CSV log file."""
+def append_prediction_row(time_str: str, model_used: str, predicted_class: str, confidence: float) -> None:
+    file_exists = PREDICTIONS_CSV_PATH.exists()
+    with PREDICTIONS_CSV_PATH.open("a", newline="") as f:
+        writer = csv.writer(f)
+        if not file_exists:
+            writer.writerow(["time", "model_used", "predicted_class", "confidence"])
+        writer.writerow([time_str, model_used, predicted_class, confidence])
 
 print(f"\n{'='*80}")
 print(f"Script location: {SCRIPT_DIR}")
@@ -239,6 +252,7 @@ async def model_info(model: str = Query("baseline", description="Model name")):
 
 @app.post("/predict", response_model=PredictionResponse)
 async def predict(
+    background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     model: str = Query("baseline", description="Model to use (baseline, alexnet, vgg16)")
 ) -> PredictionResponse:
@@ -270,6 +284,16 @@ async def predict(
             confidence = probabilities[predicted_idx].item()
 
         prob_dict = {CLASS_NAMES[i]: float(probabilities[i].item()) for i in range(NUM_CLASSES)}
+
+        """Log prediction to CSV asynchronously."""
+        now = str(datetime.now(UTC)) 
+        background_tasks.add_task(
+            append_prediction_row, 
+            now, 
+            model, 
+            CLASS_NAMES[predicted_idx], # predicted class
+            float(confidence),
+        )  
 
         return PredictionResponse(
             model_used=model,
