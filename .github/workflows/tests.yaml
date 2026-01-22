@@ -6,7 +6,6 @@ on:
       - main
       - unit-tests
       - data-preprocessing
-      - model-training
       - api-tests
   pull_request:
     branches:
@@ -178,7 +177,7 @@ jobs:
       - name: Run API integration tests
         run: |
           echo "Running API integration tests..."
-          uv run pytest tests/integration_tests/test_api.py -v --tb=short --junitxml=api-test-results.xml
+          uv run pytest tests/integration_tests/test_.py -v --tb=short --junitxml=api-test-results.xml
 
       - name: Run additional API tests if they exist
         run: |

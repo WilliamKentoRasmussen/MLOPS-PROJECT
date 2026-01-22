@@ -225,9 +225,9 @@ While good coding practices may seem less important in solo projects, they becom
 > *In total we have implemented X tests. Primarily we are testing ... and ... as these the most critical parts of our*
 > *application but also ... .*
 >
-> Answer:
+> Answer: 
 
---- question 7 fill here ---
+In total we have implemented 5 tests, unit tests namely data and model testing as well as integration and performance tests for the backend and frontend of our API. During the data and model tests we ensure the data is properly split, is in the right shape, the distinct models are accurately trained and appear in a structure which is reasonable, further whether our output has the desired shape. For our API we test how its performance is effected under several users by locust, and whether in the backend the model directories can be found as well as prediction is accuractely done, and in the frontend simply whether there is proper connection with the backend.
 
 ### Question 8
 
@@ -242,7 +242,7 @@ While good coding practices may seem less important in solo projects, they becom
 >
 > Answer:
 
---- question 8 fill here ---
+We get a total code coverage of 28% which is not necessarily high, but this also is grounded in the fact that we were unable to remove cloud_train and old_cloud_train files from also being in the coverage despite the absence of any tests for these two files, which brings the overall coverage significantly down. Even if we had 100% coverage, it doesnt mean the code is error free as coverage merely looks at the amount of code that is tested, but doesnt give any indication in regards to whether these tests work accurately, as well as not including edge cases, such as empty inputs and the competency of several files together for the most part, while we do check frontend backend competency. 
 
 ### Question 9
 
@@ -256,8 +256,9 @@ While good coding practices may seem less important in solo projects, they becom
 > *addition to the main branch. To merge code we ...*
 >
 > Answer:
+We made use of both branches and pull requests. Everyone would create their own branch when they were working on a new objective, named after the objective for easier tracking of the branches and their commits, and either when it was completely done or in an intermediate process of the objective, the branch would be merged into the main. This was mainly to ensure that neither of the branches were too far behing commits of the main as we faced this issue on the first day making merging were cumbersome. Therefore, there would be sent pull request to the remote repository where someone would have to confirm the merge and resolve any conflicts before committing the merge. Also this made it easy to go back and forth between commits to ensure version control, if we had to go back to a previous version. Afterwards the branch would be deleted, just to have a proper organisation of the directory.
 
---- question 9 fill here ---
+
 
 ### Question 10
 
@@ -272,7 +273,7 @@ While good coding practices may seem less important in solo projects, they becom
 >
 > Answer:
 
---- question 10 fill here ---
+We used DVC fundamentally as the although we had raw data in our repository for the purpose of creating dockerfiles, since our data was sourced from kaggle and versioned using dvc with metadata stored in the external storage through the .dvc. By this we were able to track the data versions, making sure model training was consistent. And it would normally increase the storage relief as the large dataset we had wouldnt have to remain locally however we had to store data locally due to other problems, this also applies to the members being able to access the same data set without constantly downloading the newest version. We also didnt end up making too many variations of the data that would benefit the logging of training for different dataset, which in a real-life project would prove to be very beneficial.
 
 ### Question 11
 
@@ -289,7 +290,15 @@ While good coding practices may seem less important in solo projects, they becom
 >
 > Answer:
 
---- question 11 fill here ---
+We have organized our continous integration into 8 separate files, pre-commit, codecheck, coverage-test,data-change,linting,model-registry, and also we included dependabot. These workflows would be activated in every pull and push request:
+Pre-commit: Ruff to get the code quality and format to a certain standard, while ignoring certain of the data directories locally
+Code-check: Does a similar job to pre-commit such as formatting the code to a certain standard however manages this between pull requests, safety net for if pre-commit is skipped
+Data-change: Executed if there is change in the data quality or situation hence updates the models if there is any change purely in the data/ folder
+Model-change: Similarly is only executed when there is changes to the model structures, handles the deployment of the new model.
+Linting: Executes the code standard and ruff and formatting similar to code-check between pull and push requests however is extended to work in development branches while code-check is mainly between main and master
+Coverage Test: Executes the coverage report of the tests on the following files we have, reporting it.
+Dependabot: Runs dependency checks automatically and updates them
+For all of the workflows we either use python 3.12 or 3.11 for the best competency, we run on ubuntu-latest however we dont test several operating systems. We use action cacheing that reduces our runtime. Here is a github action that includes coverage test: https://github.com/WilliamKentoRasmussen/MLOPS-PROJECT/actions/runs/21244110734
 
 ## Running code and tracking experiments
 
@@ -375,7 +384,75 @@ By visualizing all metrics in W&B, we were able to compare models such as the ba
 >
 > Answer:
 
---- question 15 fill here ---
+We used docker to significantly increase our training time and the reproducibility of the training with the exact same dataset, models, dependencies and making it identically reproducable to reach the same results, if deterministic obviously. We had a default config file which the training dockerfile inherited hence we would need to run with docker run --name experiment_new, and the following docker files with the needed configuratons and the training and validation accuracies were logged into wandb. We also used docker to train in the cloud as well as running the backend and frontend dockerfiles, hence we had 4 different images for each of the purposes. Here is the output from the training image, was a bit unsure as to how to share a dockerfile.
+
+\--env-file .env \train:new docker run --hostname=f3376763256a --env=WANDB_API_KEY=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 --env=WANDB_PROJECT=final_assignment_mlops --env=WANDB_ENTITY=s244794-danmarks-tekniske-universitet-dtu --env=PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin --env=LANG=C.UTF-8 --env=GPG_KEY=7169605F62C751356D054A26A821E680E5FA6305 --env=PYTHON_VERSION=3.12.12 --env=PYTHON_SHA256=fb85a13414b028c49ba18bbd523c2d055a30b56b18b92ce454ea2c51edc656c4 --env=UV_TOOL_BIN_DIR=/usr/local/bin --volume=/Users/keremozemre/Library/CloudStorage/OneDrive-DanmarksTekniskeUniversitet/MLOPS_Project/MLOPS-PROJECT/data/processed:/app/data/processed --network=bridge --restart=no --label='org.opencontainers.image.created=2026-01-15T20:29:43.472Z' --label='org.opencontainers.image.description=An extremely fast Python package and project manager, written in Rust.' --label='org.opencontainers.image.licenses=Apache-2.0' --label='org.opencontainers.image.revision=ee4f0036283a350681a618176484df6bcde27507' --label='org.opencontainers.image.source=https://github.com/astral-sh/uv' --label='org.opencontainers.image.title=uv' --label='org.opencontainers.image.url=https://github.com/astral-sh/uv' --label='org.opencontainers.image.version=0.9.26-python3.12-bookworm' --runtime=runc -d train:new
+
+   Building main-project @ file:///
+
+      Built main-project @ file:///
+
+Uninstalled 1 package in 2ms
+
+Installed 1 package in 0.49ms
+
+wandb: Currently logged in as: s244794 (s244794-danmarks-tekniske-universitet-dtu) to https://api.wandb.ai.⁠ Use `wandb login --relogin` to force relogin
+
+wandb: setting up run wi5ewrip
+
+wandb: Tracking run with wandb version 0.23.1
+
+wandb: Run data is saved locally in /wandb/run-20260116_101652-wi5ewrip
+
+wandb: Run `wandb offline` to turn off syncing.
+
+wandb: Syncing run baseline_0.001_32
+
+wandb: ⭐️ View project at https://wandb.ai/s244794-danmarks-tekniske-universitet-dtu/chest-xray-classification⁠
+
+wandb: 🚀 View run at https://wandb.ai/s244794-danmarks-tekniske-universitet-dtu/chest-xray-classification/runs/wi5ewrip⁠
+
+wandb: WARNING Symlinked 1 file into the W&B run directory; call wandb.save again to sync new files.
+
+wandb: updating run metadata
+
+wandb: uploading models/baseline_best.pth; uploading output.log; uploading wandb-summary.json
+
+wandb: uploading models/baseline_best.pth; uploading config.yaml
+
+wandb: uploading history steps 0-1, summary, console lines 10-16
+
+wandb: 
+
+wandb: Run history:
+
+wandb: best_val_accuracy ▁
+
+wandb:             epoch ▁
+
+wandb:    train/accuracy ▁
+
+wandb:        train/loss ▁
+
+wandb:      val/accuracy ▁
+
+wandb:          val/loss ▁
+
+wandb: 
+
+wandb: Run summary:
+
+wandb: best_val_accuracy 68.75
+
+wandb:             epoch 1
+
+wandb:    train/accuracy 85.62117
+
+wandb:        train/loss 0.32086
+
+wandb:      val/accuracy 68.75
+
+
 
 ### Question 16
 
@@ -519,7 +596,7 @@ We used the compute engine to run the training of our models inside the vertex a
 >
 > Answer:
 
---- question 25 fill here ---
+We both used unit and load testing for the API. We implemented unit tests for the backend for the point of testing if the endpoints worked accordingly, such as inference of single images as well as whether the model directories were found or not. For the frontend we simply, tested for the backend url properly connecting. We also implemented a load test by locust, where the priority of the tasks was given mainly to single image prediction, we didnt play with load testing too much however the system didn't crash for 10 users, and users per second at 1.
 
 ### Question 26
 
