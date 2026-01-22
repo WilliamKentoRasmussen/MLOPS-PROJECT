@@ -36,7 +36,7 @@ device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is
 # Get absolute paths - api.py is in src/main_project/
 SCRIPT_DIR = Path(__file__).resolve().parent  # /path/to/src/main_project
 PROJECT_ROOT = SCRIPT_DIR.parent.parent  # /path/to/MLOPS-PROJECT
-MODELS_DIR = PROJECT_ROOT/ "models"
+MODELS_DIR =  Path("/app/models")
 
 print(f"\n{'='*80}")
 print(f"Script location: {SCRIPT_DIR}")

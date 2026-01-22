@@ -1,0 +1,36 @@
+name: Data Change Pipeline
+
+on:
+  push:
+    paths:
+      - "data/**"
+  pull_request:
+    paths:
+      - "data/**"
+
+jobs:
+  data_pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install uv
+        run: pip install uv
+
+      - name: Install dependencies from lockfile
+        run: uv sync --frozen
+
+      - name: Validate data
+        run: uv run python scripts/validate_data.py
+
+      - name: Retrain model
+        run: uv run python scripts/train_model.py
+
+

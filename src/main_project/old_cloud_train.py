@@ -1,32 +1,39 @@
-"""Training script for Chest X-Ray classification."""
+"""Training script for Chest X-Ray classification (Vertex AI ready)."""
 
+import os
 from pathlib import Path
 
 import hydra
 import torch
+from google.cloud import storage
 from omegaconf import DictConfig, OmegaConf
 from torch import nn
 from torch.profiler import ProfilerActivity, profile
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, TensorDataset
 
 import wandb
-from main_project.data import ChestXRayDataset
 from main_project.model import get_model
+
+
+def download_from_gcs(bucket_name, source_blob_name, destination_file_name):
+    client = storage.Client()
+    bucket = client.bucket(bucket_name)
+    blob = bucket.blob(source_blob_name)
+    os.makedirs(os.path.dirname(destination_file_name), exist_ok=True)
+    blob.download_to_filename(destination_file_name)
+
+
+
 
 
 @hydra.main(version_base=None, config_path="../../configs", config_name="config")
 def train(cfg: DictConfig) -> None:
-    """
-    Train a model on Chest X-Ray dataset using Hydra configuration.
-
-    Args:
-        cfg: Hydra configuration object containing all hyperparameters
-    """
     # Print configuration
     print("Configuration:")
     print(OmegaConf.to_yaml(cfg))
     print("-" * 80)
 
+    wandb.login()
     # Initialize Weights & Biases
     wandb.init(
         project="chest-xray-classification",
@@ -41,21 +48,33 @@ def train(cfg: DictConfig) -> None:
         device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
     print(f"\nUsing device: {device}")
 
-    # Load datasets
-    print("Loading datasets...")
-    train_dataset = ChestXRayDataset(Path(cfg.data.root), split="train")
-    val_dataset = ChestXRayDataset(Path(cfg.data.root), split="val")
+    # LOAD DATA DIRECTLY FROM GCS
+    gcs_bucket = "mlops-project-pneumonia-bucket"
 
-    train_loader = DataLoader(
-        train_dataset, batch_size=cfg.training.batch_size, shuffle=True, num_workers=cfg.data.num_workers
-    )
-    val_loader = DataLoader(
-        val_dataset, batch_size=cfg.training.batch_size, shuffle=False, num_workers=cfg.data.num_workers
-    )
+    local_train_path = "data/processed/train.pt"
+    local_val_path   = "data/processed/val.pt"
 
-    print(f"Train samples: {len(train_dataset)}, Val samples: {len(val_dataset)}")
+    download_from_gcs(gcs_bucket, "processed/train.pt", local_train_path)
+    download_from_gcs(gcs_bucket, "processed/val.pt",   local_val_path)
 
-    # Create model
+    train_data = torch.load(local_train_path)
+    val_data   = torch.load(local_val_path)
+
+
+    # Wrap in DataLoader
+    train_loader = DataLoader(TensorDataset(*zip(*train_data)),
+                              batch_size=cfg.training.batch_size, shuffle=True)
+    val_loader = DataLoader(TensorDataset(*zip(*val_data)),
+                            batch_size=cfg.training.batch_size)
+
+
+
+
+
+
+    print(f"Train samples: {len(train_data)}, Val samples: {len(val_data)}")
+
+    # --- MODEL ---
     print(f"\nCreating {cfg.model.name} model...")
     model = get_model(cfg.model.name, num_classes=cfg.model.num_classes, pretrained=cfg.model.pretrained)
     model = model.to(device)
@@ -75,7 +94,7 @@ def train(cfg: DictConfig) -> None:
 
     # Profiling the training process
     with profile(activities=[ProfilerActivity.CPU],
-                             record_shapes=True) as prof:
+                 record_shapes=True) as prof:
 
         for epoch in range(cfg.training.epochs):
             # Train
@@ -84,7 +103,6 @@ def train(cfg: DictConfig) -> None:
 
             for images, labels in train_loader:
                 images, labels = images.to(device), labels.to(device)
-
                 optimizer.zero_grad()
                 outputs = model(images)
                 loss = criterion(outputs, labels)
@@ -94,8 +112,7 @@ def train(cfg: DictConfig) -> None:
                 train_loss += loss.item()
                 train_correct += (outputs.argmax(1) == labels).sum().item()
                 train_total += labels.size(0)
-
-                prof.step() # Step the profiler for each batch
+                prof.step()
 
             train_acc = 100 * train_correct / train_total
             train_loss_avg = train_loss / len(train_loader)
@@ -103,7 +120,6 @@ def train(cfg: DictConfig) -> None:
             # Validate
             model.eval()
             val_loss, val_correct, val_total = 0.0, 0, 0
-
             with torch.no_grad():
                 for images, labels in val_loader:
                     images, labels = images.to(device), labels.to(device)
@@ -117,60 +133,45 @@ def train(cfg: DictConfig) -> None:
             val_acc = 100 * val_correct / val_total
             val_loss_avg = val_loss / len(val_loader)
 
-            # Log metrics to W&B
-            wandb.log(
-                {
-                    "epoch": epoch + 1,
-                    "train/loss": train_loss_avg,
-                    "train/accuracy": train_acc,
-                    "val/loss": val_loss_avg,
-                    "val/accuracy": val_acc,
-                }
-            )
+            # Log metrics
+            wandb.log({
+                "epoch": epoch + 1,
+                "train/loss": train_loss_avg,
+                "train/accuracy": train_acc,
+                "val/loss": val_loss_avg,
+                "val/accuracy": val_acc,
+            })
 
-            print(
-                f"Epoch {epoch+1}/{cfg.training.epochs} | "
-                f"Train Loss: {train_loss_avg:.4f}, Acc: {train_acc:.2f}% | "
-                f"Val Loss: {val_loss_avg:.4f}, Acc: {val_acc:.2f}%"
-            )
+            print(f"Epoch {epoch+1}/{cfg.training.epochs} | "
+                  f"Train Loss: {train_loss_avg:.4f}, Acc: {train_acc:.2f}% | "
+                  f"Val Loss: {val_loss_avg:.4f}, Acc: {val_acc:.2f}%")
 
-            # Save best model and check early stopping
+            # Early stopping & save best model directly to GCS
+            Path("/gcs/mlops-project-pneumonia-bucket/outputs/models").mkdir(parents=True, exist_ok=True)
+            model_path = Path("/gcs/mlops-project-pneumonia-bucket/outputs/models") / f"{cfg.model.name}_best.pth"
+
             if val_acc > best_val_acc:
                 best_val_acc = val_acc
                 epochs_without_improvement = 0
-                Path(cfg.output.models_dir).mkdir(exist_ok=True)
-                model_path = f"{cfg.output.models_dir}/{cfg.model.name}_best.pth"
                 torch.save(model.state_dict(), model_path)
-
-                # Log best model to W&B
                 wandb.log({"best_val_accuracy": best_val_acc})
-                wandb.save(model_path)
-
+                wandb.save(str(model_path))
                 print(f"  → Saved best model (val_acc: {val_acc:.2f}%)")
             else:
                 epochs_without_improvement += 1
                 print(f"  → No improvement ({epochs_without_improvement}/{cfg.training.patience})")
-
                 if epochs_without_improvement >= cfg.training.patience:
-                    print(
-                        f"\n⚠ Early stopping triggered after {epoch+1} epochs (no improvement for {cfg.training.patience} epochs)"
-                    )
+                    print(f"\n⚠ Early stopping triggered after {epoch+1} epochs")
                     break
 
     print(f"\n✓ Training complete! Best val accuracy: {best_val_acc:.2f}%")
-    print(f"Model saved to: {cfg.output.models_dir}/{cfg.model.name}_best.pth")
+    print(f"Model saved to: {model_path}")
 
-    # Add profiling results
+    # Profiling results
     print("\n== Profiling Results ==")
     print(prof.key_averages().table(sort_by="cpu_time_total", row_limit=10))
-
-    # Export trace for Chrome visualization
-    trace_path = f"{cfg.output.models_dir}/trace.json"
-    prof.export_chrome_trace(trace_path)
-    print(f"\nChrome trace saved to: {trace_path}")
-    print("Open in Chrome: ui.perfetto.dev → Load → select trace.json")
-
-    # Finish W&B run
+    prof.export_chrome_trace(Path("/gcs/mlops-project-pneumonia-bucket/outputs/models") / "trace.json")
+    print("\nChrome trace saved to /gcs/mlops-project-pneumonia-bucket/outputs/models/trace.json")
     wandb.finish()
 
 
