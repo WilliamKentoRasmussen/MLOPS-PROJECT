@@ -49,32 +49,6 @@ def classify_image(image_bytes: bytes, backend: str) -> dict | None:
         st.error(f"Request failed: {e}")
     return None
 
-
-import streamlit as st
-from PIL import Image
-from io import BytesIO
-import pandas as pd
-import requests
-
-def get_backend_url() -> str:
-    """Get backend URL from environment or defaults."""
-    # This function remains the same as in your original code
-    return st.secrets.get("BACKEND_URL", "http://localhost:8000")
-
-def classify_image(image_bytes: bytes, backend_url: str) -> dict:
-    """Send image to backend for classification."""
-    try:
-        response = requests.post(
-            f"{backend_url}/predict",
-            files={"file": ("image.jpg", image_bytes, "image/jpeg")},
-            timeout=30
-        )
-        response.raise_for_status()
-        return response.json()
-    except Exception as e:
-        st.error(f"Error calling backend: {e}")
-        return None
-
 def main() -> None:
     st.title("Chest X-Ray Classification")
     st.write("Upload a chest X-Ray image to get a prediction.")

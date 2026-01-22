@@ -1,4 +1,4 @@
-name: Model Registry Change Pipeline (M19)
+name: Model Registry Change Pipeline
 
 on:
   push:
