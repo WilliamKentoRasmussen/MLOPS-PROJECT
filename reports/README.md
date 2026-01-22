@@ -256,6 +256,7 @@ We get a total code coverage of 28% which is not necessarily high, but this also
 > *addition to the main branch. To merge code we ...*
 >
 > Answer:
+
 We made use of both branches and pull requests. Everyone would create their own branch when they were working on a new objective, named after the objective for easier tracking of the branches and their commits, and either when it was completely done or in an intermediate process of the objective, the branch would be merged into the main. This was mainly to ensure that neither of the branches were too far behing commits of the main as we faced this issue on the first day making merging were cumbersome. Therefore, there would be sent pull request to the remote repository where someone would have to confirm the merge and resolve any conflicts before committing the merge. Also this made it easy to go back and forth between commits to ensure version control, if we had to go back to a previous version. Afterwards the branch would be deleted, just to have a proper organisation of the directory.
 
 
