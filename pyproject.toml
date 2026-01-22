@@ -43,6 +43,7 @@ dependencies = [
     "pydantic>=2.4.0",
     "markdown>=3.10",
     "loguru>=0.7.3",
+    "evidently>=0.7.20",
     "locust>=2.43.1",
     "streamlit>=1.53.0",
 ]
