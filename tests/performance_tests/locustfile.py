@@ -15,7 +15,7 @@ class XRayUser(HttpUser):
     - Single predictions
     - Batch predictions
     """
-    wait_time = between(1, 5)  # random wait between tasks
+    wait_time = between(1, 3)  # random wait between tasks
 
     @task(2)
     def health_check(self):
