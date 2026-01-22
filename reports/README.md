@@ -647,7 +647,7 @@ We both used unit and load testing for the API. We implemented unit tests for th
 >
 > Answer:
 
---- question 28 fill here ---
+Yes we implemented a frontend for our API, we did this because we wanted to imporve the the user interaction with the interface, also allowing for the division of the app hence only needing to scale backend technically isnt of course super applicable to the project . The frontend was able to receive the url from the backend, and display the inference. Frontend was implemented using streamlit and was also containerized by docker for deployment however we were unable to actually deploy this part to the cloud.
 
 ### Question 29
 
