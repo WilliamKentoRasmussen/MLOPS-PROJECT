@@ -7,12 +7,11 @@ import torch
 import torch.nn.functional as F
 from fastapi import FastAPI, File, HTTPException, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from main_project.model import get_model
 from omegaconf import OmegaConf
 from PIL import Image
 from pydantic import BaseModel
 from torchvision import transforms
-
-from main_project.model import get_model
 
 # Initialize FastAPI app
 app = FastAPI(

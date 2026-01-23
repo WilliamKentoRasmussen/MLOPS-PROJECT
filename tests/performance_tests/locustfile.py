@@ -1,6 +1,7 @@
-from pathlib import Path
 import random
-from locust import HttpUser, task, between
+from pathlib import Path
+
+from locust import HttpUser, between, task
 
 # Directory containing sample images for testing
 SAMPLE_IMAGES_DIR = Path("tests/sample_images")  # Put a few JPG/PNG images here
