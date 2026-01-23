@@ -27,47 +27,65 @@ We expect to use a Convolution Neural Network (CNN) for the classification of th
 
 The directory structure of the project looks like this:
 ```txt
-├── .github/                  # Github actions and dependabot
+├── .github/                  # Github actions and dependabot 
 │   ├── dependabot.yaml
 │   └── workflows/
 │       └── tests.yaml
 ├── configs/                  # Configuration files
+│   ├── README.md
+│   ├── config.yaml
+│   ├── model/
+│   └── training/
 ├── data/                     # Data directory
-│   ├── processed
-│   └── raw
+│   ├── raw/                  
+│   └── processed/
 ├── dockerfiles/              # Dockerfiles
-│   ├── api.Dockerfile
-│   └── train.Dockerfile
+│   ├── api.Dockerfile        
+│   └── train.Dockerfile      
+│   ├── cloud_train.dockerfile
+│   └── frontend.dockerfile
 ├── docs/                     # Documentation
-│   ├── mkdocs.yml
+│   ├── mkdocs.yml            
 │   └── source/
-│       └── index.md
+│       └── index.md          
 ├── models/                   # Trained models
-├── notebooks/                # Jupyter notebooks
-├── reports/                  # Reports
+│
+├── reports/                  # Report  
 │   └── figures/
 ├── src/                      # Source code
-│   ├── project_name/
-│   │   ├── __init__.py
-│   │   ├── api.py
-│   │   ├── data.py
-│   │   ├── evaluate.py
-│   │   ├── models.py
-│   │   ├── train.py
-│   │   └── visualize.py
-└── tests/                    # Tests
+│   └── main_project/         
+│       ├──__init__.py
+│       ├── api.py
+│       ├── backend.py
+│       ├── cloud_train.py 
+│       ├── data.py
+│       ├── drift.py
+│       ├── evaluate.py
+│       ├── frontend.py
+│       ├── models.py
+│       └── train.py
+├── tests/                    # Tests 
 │   ├── __init__.py
-│   ├── test_api.py
+│   ├── test_api.py          
 │   ├── test_data.py
 │   └── test_model.py
 ├── .gitignore
 ├── .pre-commit-config.yaml
 ├── LICENSE
-├── pyproject.toml            # Python project file
-├── README.md                 # Project README
-├── requirements.txt          # Project requirements
-├── requirements_dev.txt      # Development requirements
-└── tasks.py                  # Project tasks
+├── pyproject.toml           # Python project file
+├── README.md                # Project README
+├── requirements.txt         # Project requirements
+├── requirements_dev.txt     # Development requirements
+└── tasks.py                 # Project tasks
+
+# (MLOps extras)
+├── data.dvc
+├── uv.lock
+├── wandb/
+├── outputs/
+├── multirun/
+├── cloudbuild.yaml
+└── vertex_ai_train.yaml
 ```
 
 
