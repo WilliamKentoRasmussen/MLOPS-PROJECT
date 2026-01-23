@@ -112,7 +112,7 @@ will check the repositories and the code to verify your answers.
 * [ ] Write some documentation for your application (M32)
 * [ ] Publish the documentation to GitHub Pages (M32)
 * [x] Revisit your initial project description. Did the project turn out as you wanted?
-* [ ] Create an architectural diagram over your MLOps pipeline
+* [x] Create an architectural diagram over your MLOps pipeline
 * [x] Make sure all group members have an understanding about all parts of the project
 * [x] Uploaded all your code to GitHub
 
@@ -624,7 +624,17 @@ Yes we implemented a frontend for our API, we did this because we wanted to impo
 >
 > Answer:
 
---- question 29 fill here ---
+![my_image](figures/MLOpsArchitecture.png)
+
+The starting point of our diagram is our local development setup, where we integrated Hydra for managing configurations, Weights & Biases for tracking experiments, and PyTorch for building our models.
+
+Our workflow splits into two paths. For code, whenever we commit and push to GitHub, it automatically triggers GitHub Actions that run tests, check coverage, and do linting. When we merge to main, Google Cloud Build kicks in, builds a Docker container from our code, and pushes it to Artifact Registry.
+
+For data management, we use DVC to handle our chest X-ray dataset. DVC syncs with two storage backends: DTU HPC via SSH and Google Cloud Storage. This keeps our large data files out of GitHub while still maintaining version control.
+
+From there, we use Vertex AI on Google Cloud Platform to train our models. It pulls our Docker image from Artifact Registry and runs training on cloud infrastructure. All metrics get logged to Weights & Biases, and we save the best model based on validation accuracy.
+
+Once training is done, we deploy the best model using FastAPI for our REST API and Streamlit for a web interface. Users can upload chest X-ray images and get pneumonia predictions back. We also use Locust for load testing to make sure our API performs well under production load.
 
 ### Question 30
 
@@ -638,7 +648,13 @@ Yes we implemented a frontend for our API, we did this because we wanted to impo
 >
 > Answer:
 
-we faced multiple challenges during
+We encountered multiple challenges that required time and effort to overcome. One of the main difficulties was working with Docker and cloud services. Building Docker images that worked consistently across local machines and Google Cloud proved challenging, especially when dealing with platform mismatches, copying data correctly into images, and handling memory constraints in cloud-based training. 
+
+Another major challenge was setting up and maintaining continuous integration workflows. We experience repeated failures related to lining and formatting checks using ruff. Additionally, managing multiple GitHub actions workflows added complexity and required careful coordination to avoid conflicts or redundant runs. 
+
+A broader struggle throughout the project was the sheer scope of the course curriculum. The course covers many MLOps concepts in a relatively short time, and trying to implement as many of them as possible sometimes felt overwhelming. This occasionally led to a messy workflow where multiple components were developed in parallel without being fully stabilized before moving on. 
+
+We overcame these challenges through debugging, group discussions, and incremental improvements. Overall, although the project was challenging, these struggles provided valuable hands-on experience with real-world MLOps complexity.
 
 ### Question 31
 
