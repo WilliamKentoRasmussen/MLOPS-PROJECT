@@ -553,9 +553,9 @@ We both used unit and load testing for the API. We implemented unit tests for th
 >
 > Answer:
 
-We manage to implement a rough local version of model monitering using evidently to track data drift. However, we did not manage to deploy data drift monitoring or implement full system-level monitoring. Our implemented solutin uses an API to generate a CSV file containing model predictions and accuracy metrics. This CSV file is stored as a refernce dataset, which is later compared against newly geenrated data. Using Evidently's drift report, the two datasets are analyzed, and an HTML report is produced that highlights changes in data distributions and potential data drift issues.
+Monitoring is an important aspect of the machine learning pipeline, as it helps ensure the longevity and reliability of deployed applications. In particular, data drift monitoring helps detect when incoming data diverges from the training data, which can lead to degraded model performance. Detecting drift early allows teams to trigger model training or further investigation before accuracy drops significantly. 
 
-Monitorign is an important aspect of machine learnig pipeline, as it helps esnure the longevity and reliabilty of deployed applications. In particicular, data drift monitoring helps detect when incoming data diverges from the training data, whcih can lead to degraded model perfromance. Detecting drift early allows teams to trigger model training or futher investigation before accuracy drops significantly. Although we did not fully implement telemetry, we did experiment with a basic notification mechanism that triggered when the cloud service was being spammed with requests.
+We implemented limited monitoring in the form of alert systems that sends out an email if the amount of API calls exceeds a certain threshold. We would have liked to have implemented monitoring such that we could measure different looks regarding the performance of our api and data drifting in a cloud-based environment.
 
 ## Overall discussion of project
 
@@ -639,4 +639,8 @@ we faced multiple challenges during
 > *We have used ChatGPT to help debug our code. Additionally, we used GitHub Copilot to help write some of our code.*
 > Answer:
 
---- question 31 fill here ---
+The  project we completed collaboratively, with responsibilities shared among all team members. Development tasks were divided by focus areas, while major decisions and changes were discussed collectively with the group.
+
+Students s245310 and s244794 were primarily responsible for the frontend, backend, and cloud-related components, including API integration and deployment aspects. students s245310 and s252362 mainly focused on model development, data handling, data drift, profiling and logging.
+
+Generative AI tools were also used during the development process. In particular, ChatGPT and CoPilot were used to assist with debugging, understanding error messages, and exploring implementation approaches. These tools were used as support and inspiration, while all final code, design decisions, and documentations were produced and validated by group members.
