@@ -27,9 +27,8 @@ An HTML drift report will be saved to the specified output directory.
 """
 from __future__ import annotations
 
-import csv
-from pathlib import Path
 import argparse
+from pathlib import Path
 
 import pandas as pd
 from evidently.legacy.metric_preset import DataDriftPreset
@@ -41,7 +40,7 @@ def main():
     ap = argparse.ArgumentParser(description="Data Drift Detection using Evidently")
     ap.add_argument("--reference_data", type=Path, required=True, help="Path to the reference dataset CSV file")
     ap.add_argument("--current_data", type=Path, required=True, help="Path to the current dataset CSV file")
-    ap.add_argument("--output_report", type=Path, default=Path("drift_reports/drift"), help="Path to save the drift report HTML file") 
+    ap.add_argument("--output_report", type=Path, default=Path("drift_reports/drift"), help="Path to save the drift report HTML file")
     args = ap.parse_args()
 
     ref = pd.read_csv(args.reference_data)
@@ -56,7 +55,7 @@ def main():
 
     report = Report(metrics=[DataDriftPreset()])
     report.run(reference_data=ref, current_data=cur)
-    
+
 
     out_html = out_dir / "predict_drift_report.html"
     report.save_html(str(out_html))

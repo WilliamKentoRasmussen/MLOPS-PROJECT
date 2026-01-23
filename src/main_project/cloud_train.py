@@ -6,14 +6,13 @@ from pathlib import Path
 import hydra
 import torch
 from google.cloud import storage
+from main_project.data import ChestXRayDataset
+from main_project.model import get_model
 from omegaconf import DictConfig, OmegaConf
 from torch import nn
-
 from torch.utils.data import DataLoader
 
 import wandb
-from main_project.data import ChestXRayDataset
-from main_project.model import get_model
 
 
 def download_folder_from_gcs(bucket_name: str, gcs_prefix: str, local_dest: Path):

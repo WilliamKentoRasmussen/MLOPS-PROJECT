@@ -5,6 +5,8 @@ from pathlib import Path
 
 import hydra
 import torch
+from main_project.data import ChestXRayDataset
+from main_project.model import get_model
 from omegaconf import DictConfig, OmegaConf
 from sklearn.metrics import (
     accuracy_score,
@@ -14,9 +16,6 @@ from sklearn.metrics import (
     recall_score,
 )
 from torch.utils.data import DataLoader
-
-from main_project.data import ChestXRayDataset
-from main_project.model import get_model
 
 
 @hydra.main(version_base=None, config_path="../../configs", config_name="config")

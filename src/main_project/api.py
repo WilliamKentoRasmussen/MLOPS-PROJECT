@@ -1,20 +1,19 @@
 
 
+import csv
+from datetime import UTC, datetime
 from io import BytesIO
 from pathlib import Path
 
-import csv 
 import torch
 import torch.nn.functional as F
-from fastapi import FastAPI, File, HTTPException, Query, UploadFile, BackgroundTasks
+from fastapi import BackgroundTasks, FastAPI, File, HTTPException, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from main_project.model import get_model
 from omegaconf import OmegaConf
 from PIL import Image
 from pydantic import BaseModel
 from torchvision import transforms
-from datetime import datetime, UTC
-
-from main_project.model import get_model
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -286,14 +285,14 @@ async def predict(
         prob_dict = {CLASS_NAMES[i]: float(probabilities[i].item()) for i in range(NUM_CLASSES)}
 
         """Log prediction to CSV asynchronously."""
-        now = str(datetime.now(UTC)) 
+        now = str(datetime.now(UTC))
         background_tasks.add_task(
-            append_prediction_row, 
-            now, 
-            model, 
+            append_prediction_row,
+            now,
+            model,
             CLASS_NAMES[predicted_idx], # predicted class
             float(confidence),
-        )  
+        )
 
         return PredictionResponse(
             model_used=model,

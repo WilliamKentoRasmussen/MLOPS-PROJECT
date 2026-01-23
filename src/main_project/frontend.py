@@ -1,11 +1,12 @@
+import json
 import os
+import subprocess
+from io import BytesIO
+
 import pandas as pd
 import requests
 import streamlit as st
-from io import BytesIO
 from PIL import Image
-import subprocess
-import json
 
 # Class names must match backend
 CLASS_NAMES = ["NORMAL", "PNEUMONIA"]
@@ -60,11 +61,11 @@ def main() -> None:
 
     # FIXED: Make sure the file uploader is properly displayed
     uploaded_file = st.file_uploader(
-        "Choose an image file", 
+        "Choose an image file",
         type=["jpg", "jpeg", "png"],
         help="Click here to browse for an image"
     )
-    
+
     if uploaded_file is None:
         # Show a waiting message before user uploads
         st.info("👆 Please upload an image using the button above")
@@ -80,7 +81,7 @@ def main() -> None:
     # Call backend
     with st.spinner("Analyzing X-Ray image..."):
         result = classify_image(image_bytes, backend)
-    
+
     if result is None:
         st.write("Prediction could not be retrieved.")
         return
