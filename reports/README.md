@@ -523,7 +523,9 @@ In the end, we ran into a memory issue. We configured Vertex AI to download the 
 >
 > Answer:
 
---- question 24 fill here ---
+We managed to deploy our model both in the cloud and locally. For both deployment, we wrapped our model in a FastAPI framework. We deployed it in the cloud using the Cloud Run Service. To invoke the service an user would call "curl -X POST -F "file=@file.json"<https://mlops-prediction-function-1031863562600.europe-west1.run.app/predict>. It can also be ran using the docs with this url https://mlops-prediction-function-1031863562600.europe-west1.run.app/docs.
+
+
 
 ### Question 25
 
@@ -574,7 +576,22 @@ Monitorign is an important aspect of machine learnig pipeline, as it helps esnur
 >
 > Answer:
 
---- question 27 fill here ---
+During the whole project, we ended up spending a total of 36.41 kr on the google Cloud Platform. We used the same account for all implementation in the cloud, so we are unable to determine how much each group member used in credits. The total cost was spread out on the following services.
+
+Cloud run: 0.05 kr
+VM Manager: 0.21 kr
+Networking: 0.40 kr
+Cloud Build: 0.02 kr
+Container Registry Vulnerability and Scanning: 13.18 kr
+Cloud Storage: 0.18 kr
+Artifacts Registry: 0.34 kr
+Vertex AI: 1.88 kr
+Compute Engine: 20.16 kr
+
+The most expensive service was Compute Engine, due to its relatively high monthly rate and its use in training our model (as well as us forgetting to shut down multiple instances when they were inactive). I was surprised by how cheap Cloud Run was, even though it allowed us to run our backend.
+I found it quite hard to work in the cloud, but also really insightful. I learned a lot of things that I had previously been confused about in at my student work. Moreover, as I solved more and more issues, I felt that I began to understand the “cloud mindset” much better. If I could do it again, I would make sure to implement all the steps in order, and I would try to use the official troubleshooting section instead of immediately turning to ChatGPT, since that led me into a loop of pasting in suggested solutions and then pasting the resulting errors back into ChatGPT when they didn’t work. Which was a headache.
+
+
 
 ### Question 28
 
