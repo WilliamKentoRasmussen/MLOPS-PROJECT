@@ -67,42 +67,42 @@ will check the repositories and the code to verify your answers.
 * [x] Construct one or multiple docker files for your code (M10)
 * [x] Build the docker files locally and make sure they work as intended (M10)
 * [ ] Write one or multiple configurations files for your experiments (M11)
-* [ ] Used Hydra to load the configurations and manage your hyperparameters (M11)
-* [ ] Use profiling to optimize your code (M12)
-* [ ] Use logging to log important events in your code (M14)
-* [ ] Use Weights & Biases to log training progress and other important metrics/artifacts in your code (M14)
+* [x] Used Hydra to load the configurations and manage your hyperparameters (M11)
+* [x] Use profiling to optimize your code (M12)
+* [x] Use logging to log important events in your code (M14)
+* [x] Use Weights & Biases to log training progress and other important metrics/artifacts in your code (M14)
 * [ ] Consider running a hyperparameter optimization sweep (M14)
 * [ ] Use PyTorch-lightning (if applicable) to reduce the amount of boilerplate in your code (M15)
 
 ### Week 2
 
-* [ ] Write unit tests related to the data part of your code (M16)
-* [ ] Write unit tests related to model construction and or model training (M16)
-* [ ] Calculate the code coverage (M16)
-* [ ] Get some continuous integration running on the GitHub repository (M17)
-* [ ] Add caching and multi-os/python/pytorch testing to your continuous integration (M17)
-* [ ] Add a linting step to your continuous integration (M17)
-* [ ] Add pre-commit hooks to your version control setup (M18)
-* [ ] Add a continues workflow that triggers when data changes (M19)
-* [ ] Add a continues workflow that triggers when changes to the model registry is made (M19)
-* [ ] Create a data storage in GCP Bucket for your data and link this with your data version control setup (M21)
-* [ ] Create a trigger workflow for automatically building your docker images (M21)
-* [ ] Get your model training in GCP using either the Engine or Vertex AI (M21)
-* [ ] Create a FastAPI application that can do inference using your model (M22)
-* [ ] Deploy your model in GCP using either Functions or Run as the backend (M23)
-* [ ] Write API tests for your application and setup continues integration for these (M24)
-* [ ] Load test your application (M24)
+* [x] Write unit tests related to the data part of your code (M16)
+* [x] Write unit tests related to model construction and or model training (M16)
+* [x] Calculate the code coverage (M16)
+* [x] Get some continuous integration running on the GitHub repository (M17)
+* [x] Add caching and multi-os/python/pytorch testing to your continuous integration (M17)
+* [x] Add a linting step to your continuous integration (M17)
+* [x] Add pre-commit hooks to your version control setup (M18)
+* [x] Add a continues workflow that triggers when data changes (M19)
+* [x] Add a continues workflow that triggers when changes to the model registry is made (M19)
+* [x] Create a data storage in GCP Bucket for your data and link this with your data version control setup (M21)
+* [x] Create a trigger workflow for automatically building your docker images (M21)
+* [/] Get your model training in GCP using either the Engine or Vertex AI (M21)
+* [x] Create a FastAPI application that can do inference using your model (M22)
+* [x] Deploy your model in GCP using either Functions or Run as the backend (M23)
+* [x] Write API tests for your application and setup continues integration for these (M24)
+* [x] Load test your application (M24)
 * [ ] Create a more specialized ML-deployment API using either ONNX or BentoML, or both (M25)
-* [ ] Create a frontend for your API (M26)
+* [x] Create a frontend for your API (M26)
 
 ### Week 3
 
-* [ ] Check how robust your model is towards data drifting (M27)
-* [ ] Setup collection of input-output data from your deployed application (M27)
+* [x] Check how robust your model is towards data drifting (M27)
+* [x] Setup collection of input-output data from your deployed application (M27)
 * [ ] Deploy to the cloud a drift detection API (M27)
 * [ ] Instrument your API with a couple of system metrics (M28)
 * [ ] Setup cloud monitoring of your instrumented application (M28)
-* [ ] Create one or more alert systems in GCP to alert you if your app is not behaving correctly (M28)
+* [x] Create one or more alert systems in GCP to alert you if your app is not behaving correctly (M28)
 * [ ] If applicable, optimize the performance of your data loading using distributed data loading (M29)
 * [ ] If applicable, optimize the performance of your training pipeline by using distributed training (M30)
 * [ ] Play around with quantization, compilation and pruning for you trained models to increase inference speed (M31)
@@ -111,10 +111,10 @@ will check the repositories and the code to verify your answers.
 
 * [ ] Write some documentation for your application (M32)
 * [ ] Publish the documentation to GitHub Pages (M32)
-* [ ] Revisit your initial project description. Did the project turn out as you wanted?
+* [x] Revisit your initial project description. Did the project turn out as you wanted?
 * [ ] Create an architectural diagram over your MLOps pipeline
-* [ ] Make sure all group members have an understanding about all parts of the project
-* [ ] Uploaded all your code to GitHub
+* [x] Make sure all group members have an understanding about all parts of the project
+* [x] Uploaded all your code to GitHub
 
 ## Group information
 
@@ -148,7 +148,7 @@ s244705, s245310, s244794, s252362
 >
 > Answer:
 
-We did not use any open-soruce frameworks or packages that were not covered in the course for our project. 
+We did not use any open-soruce frameworks or packages that were not covered in the course for our project.
 
 ## Coding environment
 
@@ -191,7 +191,7 @@ We initialized our project using the course-provided Cookiecutter MLOps template
 
 The data directory does store contain raw datasets directly in the repository. Instead, raw data is sourced programmatically from kaggle and tracked using DVC. The .dvc directory contains metadata files that refrence versioned data stored externally.
 
-To improve configuration and reproducability, we added a config directory for managing model and pipeline parameters, as well as .devcontainer directory. We also removed the notebooks directory, as our workflow relied on script-based development rather than interactive notebooks. 
+To improve configuration and reproducability, we added a config directory for managing model and pipeline parameters, as well as .devcontainer directory. We also removed the notebooks directory, as our workflow relied on script-based development rather than interactive notebooks.
 
 ### Question 6
 
@@ -208,7 +208,7 @@ To improve configuration and reproducability, we added a config directory for ma
 
 Our code is formatted after the official Python style guide, Pep8. We added 'Ruff' as a development dependency to enforce consistent code formating, structure, and linting, healping us maintain clean and readable code. In addition, we sometimes used type hints to improve code reliability and make function inputs and outputs easier to understand. We also included documentaiton and comments where to appropriately clarify the purpose of components.
 
-While good coding practices may seem less important in solo projects, they become essential when dealing with larger projects with multiple contributers. Consistent formatting makes the codebase easier to read, typing helps prevent bugs and misunderstandings, and documentation ensures other developers can quickly understand and expand the project. 
+While good coding practices may seem less important in solo projects, they become essential when dealing with larger projects with multiple contributers. Consistent formatting makes the codebase easier to read, typing helps prevent bugs and misunderstandings, and documentation ensures other developers can quickly understand and expand the project.
 
 ## Version control
 
@@ -225,7 +225,7 @@ While good coding practices may seem less important in solo projects, they becom
 > *In total we have implemented X tests. Primarily we are testing ... and ... as these the most critical parts of our*
 > *application but also ... .*
 >
-> Answer: 
+> Answer:
 
 In total we have implemented 5 tests, unit tests namely data and model testing as well as integration and performance tests for the backend and frontend of our API. During the data and model tests we ensure the data is properly split, is in the right shape, the distinct models are accurately trained and appear in a structure which is reasonable, further whether our output has the desired shape. For our API we test how its performance is effected under several users by locust, and whether in the backend the model directories can be found as well as prediction is accuractely done, and in the frontend simply whether there is proper connection with the backend.
 
@@ -242,7 +242,7 @@ In total we have implemented 5 tests, unit tests namely data and model testing a
 >
 > Answer:
 
-We get a total code coverage of 28% which is not necessarily high, but this also is grounded in the fact that we were unable to remove cloud_train and old_cloud_train files from also being in the coverage despite the absence of any tests for these two files, which brings the overall coverage significantly down. Even if we had 100% coverage, it doesnt mean the code is error free as coverage merely looks at the amount of code that is tested, but doesnt give any indication in regards to whether these tests work accurately, as well as not including edge cases, such as empty inputs and the competency of several files together for the most part, while we do check frontend backend competency. 
+We get a total code coverage of 28% which is not necessarily high, but this also is grounded in the fact that we were unable to remove cloud_train and old_cloud_train files from also being in the coverage despite the absence of any tests for these two files, which brings the overall coverage significantly down. Even if we had 100% coverage, it doesnt mean the code is error free as coverage merely looks at the amount of code that is tested, but doesnt give any indication in regards to whether these tests work accurately, as well as not including edge cases, such as empty inputs and the competency of several files together for the most part, while we do check frontend backend competency.
 
 ### Question 9
 
@@ -318,11 +318,11 @@ For all of the workflows we either use python 3.12 or 3.11 for the best competen
 >
 > Answer:
 
-We configured training experiments using Hydra configuration files to separate model, training, and system settings. The config directory contains subfolders for model (e.g. Baseline, Alexnet, VGG16) and training (e.g., default and quick runs), each defining parameters such as architecture, learning rate, batch size, and epochs. A central config.yaml composes these components and specifies data paths, device selection, and output directories. Experiments are executed by selecting configurations at runtime, for example: 
+We configured training experiments using Hydra configuration files to separate model, training, and system settings. The config directory contains subfolders for model (e.g. Baseline, Alexnet, VGG16) and training (e.g., default and quick runs), each defining parameters such as architecture, learning rate, batch size, and epochs. A central config.yaml composes these components and specifies data paths, device selection, and output directories. Experiments are executed by selecting configurations at runtime, for example:
 ```bash
 python src/main_project/train.py model=baseline training=default
 ```
-Hydra also allows for hyperparameters to be overridden from the command line, for example: 
+Hydra also allows for hyperparameters to be overridden from the command line, for example:
 ```bash
 python src/main_project/train.py training.epochs=20 training.lr=1e-4
 ```
@@ -340,7 +340,7 @@ python src/main_project/train.py training.epochs=20 training.lr=1e-4
 >
 > Answer:
 
-We ensured experiment reproducibility by combining configuration management, data versioning, and environment control. All experiments are configured using Hydra configuration files, which separate model, training, and system parameters. Whenever an experiment is run, Hydra automatically saves the fully resolved configuration for that run, ensuring that no parameter choices are lost and that each experiment can be tracked back to its exact settings. 
+We ensured experiment reproducibility by combining configuration management, data versioning, and environment control. All experiments are configured using Hydra configuration files, which separate model, training, and system parameters. Whenever an experiment is run, Hydra automatically saves the fully resolved configuration for that run, ensuring that no parameter choices are lost and that each experiment can be tracked back to its exact settings.
 
 Data reproducibility is handled using DVC. Rather than storing raw data in the repository we track data version through DVC metadata files, allowing experiment to be rerun with the same data version even as datasets evolve. Dependency reproducibility is ensured using uv, Where all python dependencies are declared and pinned in a lockfile committed to version control.
 
@@ -364,13 +364,13 @@ To reproduce and experiment, one would restore the correct data using DVC, synch
 ![my_image](figures/WandB_1.png)
 ![my_image](figures/WandB_2.png)
 
-We used Weights & Biases (W&B) to track and compare our machine learning experiments across different model architectures and training configurations. Each run corresponds to a specific model type allowing us to systematically evaluate perfromance differences. 
+We used Weights & Biases (W&B) to track and compare our machine learning experiments across different model architectures and training configurations. Each run corresponds to a specific model type allowing us to systematically evaluate perfromance differences.
 
-As seen in the images above, we have tracked epochs, best validation accuracy, training loss, training accuracy, validation loss, and validation accuracy. Training metrics inform us about how well the model fits the training data, while validation metrics are critical for detecting overfitting and assessing generalization performance. In particular, validation accuracy serves as our primary model selection criterion, as it reflects perfromance on unseen data. we also logged best validaiton accuracy to esily compare the peak perfromance of the best runs. Additionally, we tracked epoch count to align metric across runs and ensure fair compairson when early stopping was triggered 
+As seen in the images above, we have tracked epochs, best validation accuracy, training loss, training accuracy, validation loss, and validation accuracy. Training metrics inform us about how well the model fits the training data, while validation metrics are critical for detecting overfitting and assessing generalization performance. In particular, validation accuracy serves as our primary model selection criterion, as it reflects perfromance on unseen data. we also logged best validaiton accuracy to esily compare the peak perfromance of the best runs. Additionally, we tracked epoch count to align metric across runs and ensure fair compairson when early stopping was triggered
 
-Furthermore, System metrics were also tracked. These metrics are important from an MLOps perspective, as they provide insight into hardware efficiency, resource consumption, and potential bottlenecks during training. 
+Furthermore, System metrics were also tracked. These metrics are important from an MLOps perspective, as they provide insight into hardware efficiency, resource consumption, and potential bottlenecks during training.
 
-By visualizing all metrics in W&B, we were able to compare models such as the baseline, AlexNet, and VGG16 side by side. THis enabled systematic comparison of model behavior and performance across experiments. It should be noted that the reported results do not reflect fully optimized hyperparameters, as the priority focus of this work was on implementing a reproducible and well-intrumented MLOps pipeline rather than maximizing model performance.  
+By visualizing all metrics in W&B, we were able to compare models such as the baseline, AlexNet, and VGG16 side by side. THis enabled systematic comparison of model behavior and performance across experiments. It should be noted that the reported results do not reflect fully optimized hyperparameters, as the priority focus of this work was on implementing a reproducible and well-intrumented MLOps pipeline rather than maximizing model performance.
 
 ### Question 15
 
@@ -404,7 +404,7 @@ Link:https://github.com/WilliamKentoRasmussen/MLOPS-PROJECT/blob/main/dockerfile
 >
 > Answer:
 
-Debugging method was dependent on group member. In general, when encountering bugs during experiment execution, We first attempted to identify the source of the problem by inserting print statements and inspecting intermediate outputs. For more complex or unclear errors, we made use of AI-assisted tools such as GitHub Copilot to help interpret error messages and suggest potential fixes. This iterative approach allowed us to quickly diagnose configuration issues. 
+Debugging method was dependent on group member. In general, when encountering bugs during experiment execution, We first attempted to identify the source of the problem by inserting print statements and inspecting intermediate outputs. For more complex or unclear errors, we made use of AI-assisted tools such as GitHub Copilot to help interpret error messages and suggest potential fixes. This iterative approach allowed us to quickly diagnose configuration issues.
 
 In addition to debugging, we performed basic profiling of the training loop using Pytorch's built-in ```torch.profiler```. The profiler was used to measure CPU execution time during training, helping us identify potential performance bottlenecks in the data loading and forward/backward passes. Profiling results were exported and visualized using 'ui.perfetto.dev'. While the code is not assumed to be fully optimized, this profiling step provided insight into runtime behavior and profiling implementations.
 
@@ -452,7 +452,7 @@ Our training jobs were executed using a custom Docker container, which packaged 
 > Answer:
 
 ![my_image](figures/bucket.png)
-![my_image](figures/inside_bucket.png)
+![my_image](figures/inside-bucket.png)
 
 
 ### Question 20
@@ -461,9 +461,9 @@ Our training jobs were executed using a custom Docker container, which packaged 
 > **stored. You can take inspiration from [this figure](figures/registry.png).**
 >
 > Answer:
+![my_image](figures/inside-artifacts.png)
+![my_image](figures/artifacts.png)
 
-![alt text](image-1.png)
-[alt text](image.png)
 
 ### Question 21
 
@@ -472,7 +472,8 @@ Our training jobs were executed using a custom Docker container, which packaged 
 >
 > Answer:
 
---- question 21 fill here ---
+![alt text](figures/build.jpg)
+
 
 ### Question 22
 
@@ -552,9 +553,9 @@ We both used unit and load testing for the API. We implemented unit tests for th
 >
 > Answer:
 
-We manage to implement a rough local version of model monitering using evidently to track data drift. However, we did not manage to deploy data drift monitoring or implement full system-level monitoring. Our implemented solutin uses an API to generate a CSV file containing model predictions and accuracy metrics. This CSV file is stored as a refernce dataset, which is later compared against newly geenrated data. Using Evidently's drift report, the two datasets are analyzed, and an HTML report is produced that highlights changes in data distributions and potential data drift issues. 
+We manage to implement a rough local version of model monitering using evidently to track data drift. However, we did not manage to deploy data drift monitoring or implement full system-level monitoring. Our implemented solutin uses an API to generate a CSV file containing model predictions and accuracy metrics. This CSV file is stored as a refernce dataset, which is later compared against newly geenrated data. Using Evidently's drift report, the two datasets are analyzed, and an HTML report is produced that highlights changes in data distributions and potential data drift issues.
 
-Monitorign is an important aspect of machine learnig pipeline, as it helps esnure the longevity and reliabilty of deployed applications. In particicular, data drift monitoring helps detect when incoming data diverges from the training data, whcih can lead to degraded model perfromance. Detecting drift early allows teams to trigger model training or futher investigation before accuracy drops significantly. Although we did not fully implement telemetry, we did experiment with a basic notification mechanism that triggered when the cloud service was being spammed with requests. 
+Monitorign is an important aspect of machine learnig pipeline, as it helps esnure the longevity and reliabilty of deployed applications. In particicular, data drift monitoring helps detect when incoming data diverges from the training data, whcih can lead to degraded model perfromance. Detecting drift early allows teams to trigger model training or futher investigation before accuracy drops significantly. Although we did not fully implement telemetry, we did experiment with a basic notification mechanism that triggered when the cloud service was being spammed with requests.
 
 ## Overall discussion of project
 
@@ -620,7 +621,7 @@ Yes we implemented a frontend for our API, we did this because we wanted to impo
 >
 > Answer:
 
-we faced multiple challenges during 
+we faced multiple challenges during
 
 ### Question 31
 
