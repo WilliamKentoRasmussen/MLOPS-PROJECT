@@ -53,19 +53,19 @@ will check the repositories and the code to verify your answers.
 ### Week 1
 
 * [x] Create a git repository (M5)
-* [ ] Make sure that all team members have write access to the GitHub repository (M5)
-* [ ] Create a dedicated environment for you project to keep track of your packages (M2)
-* [ ] Create the initial file structure using cookiecutter with an appropriate template (M6)
-* [ ] Fill out the `data.py` file such that it downloads whatever data you need and preprocesses it (if necessary) (M6)
-* [ ] Add a model to `model.py` and a training procedure to `train.py` and get that running (M6)
-* [ ] Remember to either fill out the `requirements.txt`/`requirements_dev.txt` files or keeping your
+* [x] Make sure that all team members have write access to the GitHub repository (M5)
+* [x] Create a dedicated environment for you project to keep track of your packages (M2)
+* [x] Create the initial file structure using cookiecutter with an appropriate template (M6)
+* [x] Fill out the `data.py` file such that it downloads whatever data you need and preprocesses it (if necessary) (M6)
+* [x] Add a model to `model.py` and a training procedure to `train.py` and get that running (M6)
+* [x] Remember to either fill out the `requirements.txt`/`requirements_dev.txt` files or keeping your
     `pyproject.toml`/`uv.lock` up-to-date with whatever dependencies that you are using (M2+M6)
-* [ ] Remember to comply with good coding practices (`pep8`) while doing the project (M7)
-* [ ] Do a bit of code typing and remember to document essential parts of your code (M7)
-* [ ] Setup version control for your data or part of your data (M8)
-* [ ] Add command line interfaces and project commands to your code where it makes sense (M9)
-* [ ] Construct one or multiple docker files for your code (M10)
-* [ ] Build the docker files locally and make sure they work as intended (M10)
+* [x] Remember to comply with good coding practices (`pep8`) while doing the project (M7)
+* [x] Do a bit of code typing and remember to document essential parts of your code (M7)
+* [x] Setup version control for your data or part of your data (M8)
+* [x] Add command line interfaces and project commands to your code where it makes sense (M9)
+* [x] Construct one or multiple docker files for your code (M10)
+* [x] Build the docker files locally and make sure they work as intended (M10)
 * [ ] Write one or multiple configurations files for your experiments (M11)
 * [ ] Used Hydra to load the configurations and manage your hyperparameters (M11)
 * [ ] Use profiling to optimize your code (M12)
@@ -385,73 +385,9 @@ By visualizing all metrics in W&B, we were able to compare models such as the ba
 >
 > Answer:
 
-We used docker to significantly increase our training time and the reproducibility of the training with the exact same dataset, models, dependencies and making it identically reproducable to reach the same results, if deterministic obviously. We had a default config file which the training dockerfile inherited hence we would need to run with docker run --name experiment_new, and the following docker files with the needed configuratons and the training and validation accuracies were logged into wandb. We also used docker to train in the cloud as well as running the backend and frontend dockerfiles, hence we had 4 different images for each of the purposes. Here is the output from the training image, was a bit unsure as to how to share a dockerfile.
-
-\--env-file .env \train:new docker run --hostname=f3376763256a --env=WANDB_API_KEY=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 --env=WANDB_PROJECT=final_assignment_mlops --env=WANDB_ENTITY=s244794-danmarks-tekniske-universitet-dtu --env=PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin --env=LANG=C.UTF-8 --env=GPG_KEY=7169605F62C751356D054A26A821E680E5FA6305 --env=PYTHON_VERSION=3.12.12 --env=PYTHON_SHA256=fb85a13414b028c49ba18bbd523c2d055a30b56b18b92ce454ea2c51edc656c4 --env=UV_TOOL_BIN_DIR=/usr/local/bin --volume=/Users/keremozemre/Library/CloudStorage/OneDrive-DanmarksTekniskeUniversitet/MLOPS_Project/MLOPS-PROJECT/data/processed:/app/data/processed --network=bridge --restart=no --label='org.opencontainers.image.created=2026-01-15T20:29:43.472Z' --label='org.opencontainers.image.description=An extremely fast Python package and project manager, written in Rust.' --label='org.opencontainers.image.licenses=Apache-2.0' --label='org.opencontainers.image.revision=ee4f0036283a350681a618176484df6bcde27507' --label='org.opencontainers.image.source=https://github.com/astral-sh/uv' --label='org.opencontainers.image.title=uv' --label='org.opencontainers.image.url=https://github.com/astral-sh/uv' --label='org.opencontainers.image.version=0.9.26-python3.12-bookworm' --runtime=runc -d train:new
-
-   Building main-project @ file:///
-
-      Built main-project @ file:///
-
-Uninstalled 1 package in 2ms
-
-Installed 1 package in 0.49ms
-
-wandb: Currently logged in as: s244794 (s244794-danmarks-tekniske-universitet-dtu) to https://api.wandb.ai.⁠ Use `wandb login --relogin` to force relogin
-
-wandb: setting up run wi5ewrip
-
-wandb: Tracking run with wandb version 0.23.1
-
-wandb: Run data is saved locally in /wandb/run-20260116_101652-wi5ewrip
-
-wandb: Run `wandb offline` to turn off syncing.
-
-wandb: Syncing run baseline_0.001_32
-
-wandb: ⭐️ View project at https://wandb.ai/s244794-danmarks-tekniske-universitet-dtu/chest-xray-classification⁠
-
-wandb: 🚀 View run at https://wandb.ai/s244794-danmarks-tekniske-universitet-dtu/chest-xray-classification/runs/wi5ewrip⁠
-
-wandb: WARNING Symlinked 1 file into the W&B run directory; call wandb.save again to sync new files.
-
-wandb: updating run metadata
-
-wandb: uploading models/baseline_best.pth; uploading output.log; uploading wandb-summary.json
-
-wandb: uploading models/baseline_best.pth; uploading config.yaml
-
-wandb: uploading history steps 0-1, summary, console lines 10-16
-
-wandb: 
-
-wandb: Run history:
-
-wandb: best_val_accuracy ▁
-
-wandb:             epoch ▁
-
-wandb:    train/accuracy ▁
-
-wandb:        train/loss ▁
-
-wandb:      val/accuracy ▁
-
-wandb:          val/loss ▁
-
-wandb: 
-
-wandb: Run summary:
-
-wandb: best_val_accuracy 68.75
-
-wandb:             epoch 1
-
-wandb:    train/accuracy 85.62117
-
-wandb:        train/loss 0.32086
-
-wandb:      val/accuracy 68.75
+We developed four docker images to containerize different components of our classification project: training, backend, frontend and cloud training. Docker was used for reproducibility and consistent environments across development, testing, and deployment.
+All of our dockerfiles use uv package manager. Our training dockerfile accepts hydra configuration overrides as runtime arguments. For example, running the training docker image:  docker run trainer:latest model=baseline training.lr=1e-3 training.batch_size=64 training.epochs=20. The backend dockerfile can be run with port mapping: docker run -p 8000:8000 backend:latest
+Link:https://github.com/WilliamKentoRasmussen/MLOPS-PROJECT/blob/main/dockerfiles/train.dockerfile
 
 
 
@@ -502,7 +438,9 @@ We used the following service: Artifacts, Cloud Build, Cloud Run, and Vertex AI.
 >
 > Answer:
 
-We used the compute engine to run the training of our models inside the vertex ai. We used the following hardware: CPU and we started the dockerfile on our computer.
+We used the Compute Engine indirectly through Vertex AI Custom Jobs to run our model training in the cloud. The vertex ai takes use of a virtual instance with the machine type n1-highmem-2, which provides 2 vCPUs and 13 GB of RAM, making it suitable for memory-intensive data loading and preprocessing tasks. Although we initially planned to use GPUs for faster training, our GPU quota request was not approved, so all experiments were run on CPU-based instances.
+
+Our training jobs were executed using a custom Docker container, which packaged our full training environment, including source code, dependencies, and configuration files. This ensured that every training run was fully reproducible and isolated from the local development setup. Sensitive credentials such as API keys were not hardcoded into the container; instead, they were securely injected at runtime using Google Cloud Secret Manager and environment variables. This design follows best practices for cloud security and allows us to update secrets without rebuilding images, while Compute Engine handled the scalable and reliable execution of the training workloads.
 
 
 
@@ -549,7 +487,9 @@ We used the compute engine to run the training of our models inside the vertex a
 >
 > Answer:
 
---- question 22 fill here ---
+We tried to train our model in the cloud using Vertex AI. Unfortunately, we did not succeed. We chose the Vertex AI service to simplify the training setup on a virtual machine, since it could potentially allow us to configure different learning parameters and store the trained weights in a Cloud Storage bucket. We overcame several problems along the way, mostly concerning permissions, Dockerfiles (copying our data), and building the Docker image for the correct platform (we initially built for macOS, which apparently can not be run in the cloud).
+In the end, we ran into a memory issue. We configured Vertex AI to download the data from the bucket, which worked sometimes, but other times the job ran out of memory. We tried upgrading our virtual machine to an n1-highmem-8 instance, but this did not solve the issue. We assume that there might be some other issues in how it stores some of the data. We might have been able to resolve this given more time, but we decided to focus on other parts of the curriculum. We really tried though :\)
+
 
 ## Deployment
 
@@ -612,7 +552,9 @@ We both used unit and load testing for the API. We implemented unit tests for th
 >
 > Answer:
 
---- question 26 fill here ---
+We manage to implement a rough local version of model monitering using evidently to track data drift. However, we did not manage to deploy data drift monitoring or implement full system-level monitoring. Our implemented solutin uses an API to generate a CSV file containing model predictions and accuracy metrics. This CSV file is stored as a refernce dataset, which is later compared against newly geenrated data. Using Evidently's drift report, the two datasets are analyzed, and an HTML report is produced that highlights changes in data distributions and potential data drift issues. 
+
+Monitorign is an important aspect of machine learnig pipeline, as it helps esnure the longevity and reliabilty of deployed applications. In particicular, data drift monitoring helps detect when incoming data diverges from the training data, whcih can lead to degraded model perfromance. Detecting drift early allows teams to trigger model training or futher investigation before accuracy drops significantly. Although we did not fully implement telemetry, we did experiment with a basic notification mechanism that triggered when the cloud service was being spammed with requests. 
 
 ## Overall discussion of project
 
@@ -678,7 +620,7 @@ Yes we implemented a frontend for our API, we did this because we wanted to impo
 >
 > Answer:
 
---- question 30 fill here ---
+we faced multiple challenges during 
 
 ### Question 31
 
