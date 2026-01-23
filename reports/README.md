@@ -507,7 +507,7 @@ In the end, we ran into a memory issue. We configured Vertex AI to download the 
 >
 > Answer:
 
---- question 23 fill here ---
+We have implemented an API, which can be seen as a backend file, we used fastapi to build the backend application. Our application has endpoints which checks the functionality of the application, such as health and whether the model directories can be found, applied to all the three different models we have baseline, alexnet and vgg16. However, the main inference of the API is classification of given chest-xrays which predict whether pnemonuia is apparent or not with a probability and a confidence. Furthermore, the inference can be made so that the input takes a batch of images, hence technically the API can handle a whole dataset fed into it and makes a series of predictions, however we didn't try whether this batch inference can infact handle all sizes of datasets.
 
 ### Question 24
 
