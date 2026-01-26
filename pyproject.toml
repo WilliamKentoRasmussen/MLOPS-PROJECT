@@ -21,7 +21,7 @@ dependencies = [
     "dvc>=3.66.1",
     "dvc-gdrive>=3.0.1",
     "dvc-ssh>=4.2.2",
-    "fastapi==0.115.6",
+    "fastapi==0.128.0",
     "hydra-core>=1.3.2",
     "kaggle>=1.6.0",
     "matplotlib>=3.8.0",
